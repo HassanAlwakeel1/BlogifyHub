@@ -6,6 +6,7 @@ import com.BlogifyHub.model.DTO.PostResponseDTO;
 import com.BlogifyHub.model.entity.Post;
 import com.BlogifyHub.repository.PostRepository;
 import com.BlogifyHub.service.PostService;
+import org.modelmapper.ModelMapper;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -20,8 +21,11 @@ public class PostServiceimpl implements PostService {
 
     private PostRepository postRepository;
 
-    public PostServiceimpl(PostRepository postRepository){
+    private ModelMapper mapper;
+
+    public PostServiceimpl(PostRepository postRepository, ModelMapper modelMapper){
         this.postRepository = postRepository;
+        this.mapper = modelMapper;
     }
 
     @Override
@@ -87,29 +91,12 @@ public class PostServiceimpl implements PostService {
     }
 
     private PostDTO mapToDTO(Post post){
-
-        if (post==null){
-            return null;
-        }
-
-        PostDTO postDto = new PostDTO();
-        postDto.setId(post.getId());
-        postDto.setTitle(post.getTitle());
-        postDto.setDescription(post.getDescription());
-        postDto.setContent(post.getContent());
+        PostDTO postDto = mapper.map(post,PostDTO.class);
         return postDto;
     }
 
     private Post mapToEntity(PostDTO postDTO){
-
-        if (postDTO==null){
-            return null;
-        }
-
-        Post post = new Post();
-        post.setTitle(postDTO.getTitle());
-        post.setDescription(postDTO.getContent());
-        post.setContent(postDTO.getContent());
+        Post post = mapper.map(postDTO,Post.class);
         return post;
     }
 }
