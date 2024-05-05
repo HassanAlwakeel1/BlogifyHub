@@ -4,6 +4,7 @@ import com.BlogifyHub.model.DTO.PostDTO;
 import com.BlogifyHub.model.DTO.PostResponseDTO;
 import com.BlogifyHub.service.PostService;
 import com.BlogifyHub.utility.AppConstants;
+import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -19,7 +20,7 @@ public class PostController {
         this.postService = postService;
     }
     @PostMapping
-    public ResponseEntity<PostDTO> createPost(@RequestBody PostDTO postDTO){
+    public ResponseEntity<PostDTO> createPost(@Valid @RequestBody PostDTO postDTO){
         return new ResponseEntity<>(postService.createPost(postDTO), HttpStatus.CREATED);
     }
 
@@ -39,7 +40,7 @@ public class PostController {
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<PostDTO> updatePost(@RequestBody PostDTO postDTO,@PathVariable(name = "id") long id){
+    public ResponseEntity<PostDTO> updatePost(@Valid @RequestBody PostDTO postDTO,@PathVariable(name = "id") long id){
         PostDTO postResponse = postService.updatePost(postDTO,id);
         return new ResponseEntity<>(postResponse,HttpStatus.OK);
     }
