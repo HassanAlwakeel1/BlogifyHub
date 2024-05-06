@@ -3,6 +3,8 @@ package com.BlogifyHub.repository;
 import com.BlogifyHub.model.entity.Post;
 import org.springframework.data.jpa.repository.JpaRepository;
 
-public interface PostRepository extends JpaRepository<Post,Long> {
+import java.util.List;
 
+public interface PostRepository extends JpaRepository<Post,Long> {
+    List<Post> findByCategoryId(Long categoryId);
 }

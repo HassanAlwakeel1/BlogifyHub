@@ -3,7 +3,9 @@ package com.BlogifyHub.service.impl;
 import com.BlogifyHub.exception.ResourceNotFoundException;
 import com.BlogifyHub.model.DTO.PostDTO;
 import com.BlogifyHub.model.DTO.PostResponseDTO;
+import com.BlogifyHub.model.entity.Category;
 import com.BlogifyHub.model.entity.Post;
+import com.BlogifyHub.repository.CategoryRepository;
 import com.BlogifyHub.repository.PostRepository;
 import com.BlogifyHub.service.PostService;
 import org.modelmapper.ModelMapper;
@@ -23,9 +25,14 @@ public class PostServiceimpl implements PostService {
 
     private ModelMapper mapper;
 
-    public PostServiceimpl(PostRepository postRepository, ModelMapper modelMapper){
+    private CategoryRepository categoryRepository;
+
+    public PostServiceimpl(PostRepository postRepository,
+                           ModelMapper modelMapper,
+                           CategoryRepository categoryRepository){
         this.postRepository = postRepository;
         this.mapper = modelMapper;
+        this.categoryRepository = categoryRepository;
     }
 
     @Override
@@ -88,6 +95,16 @@ public class PostServiceimpl implements PostService {
         Post post = postRepository.findById(id)
                 .orElseThrow(()-> new ResourceNotFoundException("Post","id",id));
         postRepository.delete(post);
+    }
+
+    @Override
+    public List<PostDTO> getPostsByCategory(Long categoryId) {
+        Category category = categoryRepository.findById(categoryId)
+                .orElseThrow(() -> new ResourceNotFoundException("Category", "id", categoryId));
+
+        List<Post> posts = postRepository.findByCategoryId(categoryId);
+        return posts.stream().map((post -> mapToDTO(post)))
+                .collect(Collectors.toList());
     }
 
     private PostDTO mapToDTO(Post post){

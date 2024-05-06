@@ -25,4 +25,6 @@ public class PostDTO {
 
     private Set<CommentDTO> comments;
 
+    private Long categoryId;
+
 }
