@@ -1,6 +1,7 @@
 package com.BlogifyHub.service.impl;
 
 import com.BlogifyHub.exception.ResourceNotFoundException;
+import com.BlogifyHub.model.DTO.CustomUserDTO;
 import com.BlogifyHub.model.DTO.UserDTO;
 import com.BlogifyHub.model.DTO.UserProfileDTO;
 import com.BlogifyHub.model.entity.User;
@@ -13,6 +14,9 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
+
+import java.util.ArrayList;
+import java.util.List;
 
 @Service
 @RequiredArgsConstructor
@@ -58,12 +62,27 @@ public class UserServiceImpl implements UserService {
         return ResponseEntity.ok("User deleted successfully");
     }
 
+    @Override
+    public ResponseEntity<List<CustomUserDTO>> getAllUsers() {
+        List<User> users = userRepository.findAll();
+        List<CustomUserDTO> customUserDTOS = new ArrayList<>();
+        for (User user : users) {
+            CustomUserDTO customUserDTO = userToCustomUserDTO(user);
+            customUserDTOS.add(customUserDTO);
+        }
+        return ResponseEntity.ok(customUserDTOS);
+    }
+
     private UserDTO userToUserDTO(User user){
         return mapper.map(user,UserDTO.class);
     }
 
     private UserProfileDTO userToUserProfileDTO(User user){
         return mapper.map(user,UserProfileDTO.class);
+    }
+
+    private CustomUserDTO userToCustomUserDTO(User user){
+        return mapper.map(user,CustomUserDTO.class);
     }
 
 }
