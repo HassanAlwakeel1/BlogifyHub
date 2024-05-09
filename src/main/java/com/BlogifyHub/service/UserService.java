@@ -11,4 +11,6 @@ public interface UserService {
     ResponseEntity<UserDTO> getUserById(Long userId);
 
     ResponseEntity<UserProfileDTO> updateUserProfile(UserProfileDTO userProfileDTO, Long userId);
+
+    ResponseEntity<String> deleteUser(Long userId);
 }

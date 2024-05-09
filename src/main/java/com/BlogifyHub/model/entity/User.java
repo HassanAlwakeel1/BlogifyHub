@@ -58,6 +58,10 @@ public class User implements UserDetails {
 
     @OneToMany(mappedBy = "user",cascade = CascadeType.REMOVE)
     @JsonManagedReference
+    private List<Token> tokens;
+
+    @OneToMany(mappedBy = "user",cascade = CascadeType.REMOVE)
+    @JsonManagedReference
     private List<Post> userPosts;
 
     @Override

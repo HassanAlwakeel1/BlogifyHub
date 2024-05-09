@@ -50,6 +50,14 @@ public class UserServiceImpl implements UserService {
         return ResponseEntity.ok(updatedUserProfileDTO);
     }
 
+    @Override
+    public ResponseEntity<String> deleteUser(Long userId) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(()-> new ResourceNotFoundException("User","id",userId));
+        userRepository.delete(user);
+        return ResponseEntity.ok("User deleted successfully");
+    }
+
     private UserDTO userToUserDTO(User user){
         return mapper.map(user,UserDTO.class);
     }
