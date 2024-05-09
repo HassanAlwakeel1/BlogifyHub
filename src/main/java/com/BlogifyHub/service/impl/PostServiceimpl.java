@@ -5,8 +5,10 @@ import com.BlogifyHub.model.DTO.PostDTO;
 import com.BlogifyHub.model.DTO.PostResponseDTO;
 import com.BlogifyHub.model.entity.Category;
 import com.BlogifyHub.model.entity.Post;
+import com.BlogifyHub.model.entity.User;
 import com.BlogifyHub.repository.CategoryRepository;
 import com.BlogifyHub.repository.PostRepository;
+import com.BlogifyHub.repository.UserRepository;
 import com.BlogifyHub.service.PostService;
 import org.modelmapper.ModelMapper;
 import org.springframework.data.domain.Page;
@@ -27,17 +29,23 @@ public class PostServiceimpl implements PostService {
 
     private CategoryRepository categoryRepository;
 
+    private UserRepository userRepository;
+
     public PostServiceimpl(PostRepository postRepository,
                            ModelMapper modelMapper,
-                           CategoryRepository categoryRepository){
+                           CategoryRepository categoryRepository,
+                           UserRepository userRepository){
         this.postRepository = postRepository;
         this.mapper = modelMapper;
         this.categoryRepository = categoryRepository;
+        this.userRepository = userRepository;
     }
 
     @Override
-    public PostDTO createPost(PostDTO postDTO) {
+    public PostDTO createPost(PostDTO postDTO, Long userId) {
         Post post = mapToEntity(postDTO);
+        User user = userRepository.findById(userId).orElseThrow(()-> new ResourceNotFoundException("User","id",userId));
+        post.setUser(user);
         Post newPost = postRepository.save(post);
         PostDTO postRespose = mapToDTO(newPost);
         return postRespose;

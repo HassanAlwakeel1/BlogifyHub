@@ -1,6 +1,7 @@
 package com.BlogifyHub.model.entity;
 
 import com.BlogifyHub.model.entity.enums.Role;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
@@ -37,6 +38,10 @@ public class User implements UserDetails {
     @Size(max = 100, message = "Last name can't exceed 100 characters")
     private String lastName;
 
+    @Column(name = "bio")
+    @Size(max = 500, message = "Bio can't exceed 300 characters.")
+    private String bio;
+
     @Column(name = "password",nullable = false)
     @NotBlank(message = "password is required")
     @Size(max = 100, message = "Password can't exceed 100 characters")
@@ -50,6 +55,10 @@ public class User implements UserDetails {
     @Enumerated(EnumType.STRING)
     @Column(name = "role")
     private Role role;
+
+    @OneToMany(mappedBy = "user",cascade = CascadeType.REMOVE)
+    @JsonManagedReference
+    private List<Post> userPosts;
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {

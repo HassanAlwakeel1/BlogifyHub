@@ -6,7 +6,7 @@ import com.BlogifyHub.model.DTO.PostResponseDTO;
 import java.util.List;
 
 public interface PostService {
-    PostDTO createPost(PostDTO postDTO);
+    PostDTO createPost(PostDTO postDTO, Long userId);
 
     PostResponseDTO getAllPosts(int pageNumber, int pageSize, String sortBy, String sortDirection);
 

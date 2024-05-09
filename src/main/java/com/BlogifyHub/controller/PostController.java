@@ -13,7 +13,7 @@ import java.util.List;
 
 
 @RestController
-@RequestMapping("/api/posts")
+@RequestMapping("/user/{userId}/api/posts")
 public class PostController {
 
     private PostService postService;
@@ -21,9 +21,9 @@ public class PostController {
     public PostController(PostService postService) {
         this.postService = postService;
     }
-    @PostMapping
-    public ResponseEntity<PostDTO> createPost(@Valid @RequestBody PostDTO postDTO){
-        return new ResponseEntity<>(postService.createPost(postDTO), HttpStatus.CREATED);
+    @PostMapping()
+    public ResponseEntity<PostDTO> createPost(@Valid @RequestBody PostDTO postDTO,@PathVariable Long userId){
+        return new ResponseEntity<>(postService.createPost(postDTO,userId), HttpStatus.CREATED);
     }
 
     @GetMapping
