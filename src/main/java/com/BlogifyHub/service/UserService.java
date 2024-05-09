@@ -1,6 +1,7 @@
 package com.BlogifyHub.service;
 
 import com.BlogifyHub.model.DTO.CustomUserDTO;
+import com.BlogifyHub.model.DTO.UpdatedProfileDTO;
 import com.BlogifyHub.model.DTO.UserDTO;
 import com.BlogifyHub.model.DTO.UserProfileDTO;
 import com.BlogifyHub.model.entity.User;
@@ -13,7 +14,7 @@ public interface UserService {
     UserDetailsService userDetailsService();
     ResponseEntity<UserDTO> getUserById(Long userId);
 
-    ResponseEntity<UserProfileDTO> updateUserProfile(UserProfileDTO userProfileDTO, Long userId);
+    ResponseEntity<UpdatedProfileDTO> updateUserProfile(UserProfileDTO userProfileDTO, Long userId);
 
     ResponseEntity<String> deleteUser(Long userId);
 

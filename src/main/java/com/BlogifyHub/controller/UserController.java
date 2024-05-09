@@ -1,6 +1,7 @@
 package com.BlogifyHub.controller;
 
 import com.BlogifyHub.model.DTO.CustomUserDTO;
+import com.BlogifyHub.model.DTO.UpdatedProfileDTO;
 import com.BlogifyHub.model.DTO.UserDTO;
 import com.BlogifyHub.model.DTO.UserProfileDTO;
 import com.BlogifyHub.model.entity.User;
@@ -30,8 +31,8 @@ public class UserController {
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<UserProfileDTO> updateUserProfile(@RequestBody UserProfileDTO userProfileDTO,
-                                                            @PathVariable(value = "id") Long userId){
+    public ResponseEntity<UpdatedProfileDTO> updateUserProfile(@ModelAttribute UserProfileDTO userProfileDTO,
+                                                               @PathVariable(value = "id") Long userId){
         return userService.updateUserProfile(userProfileDTO, userId);
     }
     @DeleteMapping("/{id}")

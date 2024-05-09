@@ -52,6 +52,9 @@ public class User implements UserDetails {
     //TODO : here handle the exception when someone trying to enter an email already exists in the db
     private String email;
 
+    @Column(name = "profile_picture_url")
+    private String ProfilePictureURL;
+
     @Enumerated(EnumType.STRING)
     @Column(name = "role")
     private Role role;
