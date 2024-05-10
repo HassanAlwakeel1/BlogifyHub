@@ -1,10 +1,6 @@
 package com.BlogifyHub.controller;
 
-import com.BlogifyHub.model.DTO.CustomUserDTO;
-import com.BlogifyHub.model.DTO.UpdatedProfileDTO;
-import com.BlogifyHub.model.DTO.UserDTO;
-import com.BlogifyHub.model.DTO.UserProfileDTO;
-import com.BlogifyHub.model.entity.User;
+import com.BlogifyHub.model.DTO.*;
 import com.BlogifyHub.service.UserService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -38,5 +34,10 @@ public class UserController {
     @DeleteMapping("/{id}")
     public ResponseEntity<String> deleteUser(@PathVariable(name = "id") Long userId){
         return userService.deleteUser(userId);
+    }
+    @PutMapping("/{id}/password")
+    public ResponseEntity<String> changePassword(@PathVariable(name = "id") Long userId,
+                                                 @RequestBody ChangePasswordDTO changePasswordDTO){
+        return userService.changePassword(changePasswordDTO, userId);
     }
 }

@@ -1,20 +1,19 @@
 package com.BlogifyHub.service.impl;
 
 import com.BlogifyHub.exception.ResourceNotFoundException;
-import com.BlogifyHub.model.DTO.CustomUserDTO;
-import com.BlogifyHub.model.DTO.UpdatedProfileDTO;
-import com.BlogifyHub.model.DTO.UserDTO;
-import com.BlogifyHub.model.DTO.UserProfileDTO;
+import com.BlogifyHub.model.DTO.*;
 import com.BlogifyHub.model.entity.User;
 import com.BlogifyHub.repository.UserRepository;
 import com.BlogifyHub.service.CloudinaryImageService;
 import com.BlogifyHub.service.UserService;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -31,6 +30,8 @@ public class UserServiceImpl implements UserService {
     private final ModelMapper mapper;
 
     private final CloudinaryImageService cloudinaryImageService;
+
+    private final PasswordEncoder passwordEncoder;
 
 
 
@@ -84,6 +85,21 @@ public class UserServiceImpl implements UserService {
             customUserDTOS.add(customUserDTO);
         }
         return ResponseEntity.ok(customUserDTOS);
+    }
+
+    @Override
+    public ResponseEntity<String> changePassword(ChangePasswordDTO changePasswordDTO, Long userId) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(()-> new ResourceNotFoundException("User","id",userId));
+        String userPassword = user.getPassword();
+        String oldPassword = changePasswordDTO.getOldPassword();
+        String newPassword = changePasswordDTO.getNewPassword();
+        String newPasswordConfirmation = changePasswordDTO.getNewPasswordConfirmation();
+        if (newPassword.equals(newPasswordConfirmation) && passwordEncoder.matches(oldPassword, userPassword)){
+            user.setPassword(passwordEncoder.encode(newPassword));
+            userRepository.save(user);
+            return ResponseEntity.ok("Password changed successfully!");
+        }else return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Bad credentials");
     }
 
     private UserDTO userToUserDTO(User user){
