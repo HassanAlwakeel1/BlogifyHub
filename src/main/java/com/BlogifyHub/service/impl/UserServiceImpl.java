@@ -2,7 +2,9 @@ package com.BlogifyHub.service.impl;
 
 import com.BlogifyHub.exception.ResourceNotFoundException;
 import com.BlogifyHub.model.DTO.*;
+import com.BlogifyHub.model.entity.Post;
 import com.BlogifyHub.model.entity.User;
+import com.BlogifyHub.repository.PostRepository;
 import com.BlogifyHub.repository.UserRepository;
 import com.BlogifyHub.service.CloudinaryImageService;
 import com.BlogifyHub.service.UserService;
@@ -20,6 +22,7 @@ import org.springframework.web.multipart.MultipartFile;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -33,6 +36,7 @@ public class UserServiceImpl implements UserService {
 
     private final PasswordEncoder passwordEncoder;
 
+    private final PostRepository postRepository;
 
 
     public UserDetailsService userDetailsService(){
@@ -48,8 +52,18 @@ public class UserServiceImpl implements UserService {
     public ResponseEntity<UserDTO> getUserById(Long userId){
         User user = userRepository.findById(userId).orElseThrow(()-> new ResourceNotFoundException("User","id",userId));
         UserDTO userDTO = userToUserDTO(user);
+        List<Post> listOfPosts = user.getUserPosts();
+
+        List<UserPostDTO> userPostDTOs = listOfPosts.stream()
+                .map(post -> {
+                    UserPostDTO postDTO = mapPostToUserPostDTO(post);
+                    return postDTO;
+                })
+                .collect(Collectors.toList());
+        userDTO.setUserPostDTOs(userPostDTOs);
         return ResponseEntity.ok(userDTO);
     }
+
 
     @Override
     public ResponseEntity<ProfileResponseDTO> updateUserProfile(UserProfileDTO userProfileDTO, Long userId) {
@@ -114,6 +128,9 @@ public class UserServiceImpl implements UserService {
         return mapper.map(user,CustomUserDTO.class);
     }
 
+    private UserPostDTO mapPostToUserPostDTO(Post post){
+        return mapper.map(post,UserPostDTO.class);
+    }
 }
 
 

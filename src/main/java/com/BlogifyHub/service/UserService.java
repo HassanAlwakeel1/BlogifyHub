@@ -1,6 +1,7 @@
 package com.BlogifyHub.service;
 
 import com.BlogifyHub.model.DTO.*;
+import com.BlogifyHub.model.entity.Post;
 import com.BlogifyHub.model.entity.User;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.userdetails.UserDetailsService;

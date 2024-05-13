@@ -16,6 +16,7 @@ public class UserDTO {
     private String firstName;
     private String lastName;
     private String bio;
+    private String profilePhotoURL;
     private Role role;
-    private List<Post> posts;
+    private List<UserPostDTO> userPostDTOs;
 }
