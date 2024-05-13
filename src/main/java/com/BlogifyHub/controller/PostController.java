@@ -13,7 +13,7 @@ import java.util.List;
 
 
 @RestController
-@RequestMapping("/user/{userId}/api/posts")
+@RequestMapping("/api/posts")
 public class PostController {
 
     private PostService postService;
@@ -21,11 +21,6 @@ public class PostController {
     public PostController(PostService postService) {
         this.postService = postService;
     }
-    @PostMapping()
-    public ResponseEntity<PostDTO> createPost(@Valid @RequestBody PostDTO postDTO,@PathVariable Long userId){
-        return new ResponseEntity<>(postService.createPost(postDTO,userId), HttpStatus.CREATED);
-    }
-
     @GetMapping
     public PostResponseDTO getAllPosts(
             @RequestParam(value = "pageNumber", defaultValue = AppConstants.DEFAULT_PAGE_NUMBER, required = false) int pageNumber,
@@ -39,18 +34,6 @@ public class PostController {
     @GetMapping("/{id}")
     public ResponseEntity<PostDTO> getPostById(@PathVariable(name = "id") long id){
         return ResponseEntity.ok(postService.getPostById(id));
-    }
-
-    @PutMapping("/{id}")
-    public ResponseEntity<PostDTO> updatePost(@Valid @RequestBody PostDTO postDTO,@PathVariable(name = "id") long id){
-        PostDTO postResponse = postService.updatePost(postDTO,id);
-        return new ResponseEntity<>(postResponse,HttpStatus.OK);
-    }
-
-    @DeleteMapping("/{id}")
-    public ResponseEntity<String> deletePost(@PathVariable(name = "id") long id){
-        postService.deletePostById(id);
-        return new ResponseEntity<>("Post entity deleted successfully.",HttpStatus.OK);
     }
 
     @GetMapping("/category/{id}")

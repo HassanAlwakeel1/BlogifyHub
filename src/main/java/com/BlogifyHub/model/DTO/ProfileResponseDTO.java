@@ -8,7 +8,7 @@ import org.springframework.web.multipart.MultipartFile;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class UpdatedProfileDTO {
+public class ProfileResponseDTO {
     private Long id;
     private String firstName;
     private String lastName;

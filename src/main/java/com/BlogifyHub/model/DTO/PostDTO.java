@@ -1,13 +1,17 @@
 package com.BlogifyHub.model.DTO;
 
 import jakarta.validation.constraints.NotEmpty;
-import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 import java.util.Set;
 
 @Data
+@AllArgsConstructor
+@NoArgsConstructor
 public class PostDTO {
 
     private Long id;
@@ -22,6 +26,8 @@ public class PostDTO {
 
     @NotEmpty
     private String content;
+
+    private ProfileResponseDTO profileResponseDTO;
 
     private Set<CommentDTO> comments;
 

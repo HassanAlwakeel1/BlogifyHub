@@ -71,10 +71,9 @@ public class CommentServiceImpl implements CommentService {
             throw new BlogAPIException(HttpStatus.BAD_REQUEST, "Comment does not belong to post");
         }
         comment.setName(commentDTO.getName());
-        comment.setEmail(commentDTO.getEmail());
         comment.setBody(commentDTO.getBody());
         Comment updatedComment = commentRepository.save(comment);
-        return mapToDTO(comment);
+        return mapToDTO(updatedComment);
     }
 
     @Override

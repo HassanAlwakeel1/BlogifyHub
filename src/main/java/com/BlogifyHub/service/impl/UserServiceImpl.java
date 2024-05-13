@@ -52,7 +52,7 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public ResponseEntity<UpdatedProfileDTO> updateUserProfile(UserProfileDTO userProfileDTO, Long userId) {
+    public ResponseEntity<ProfileResponseDTO> updateUserProfile(UserProfileDTO userProfileDTO, Long userId) {
         User user = userRepository.findById(userId).orElseThrow(()-> new ResourceNotFoundException("User","id",userId));
         user.setFirstName(userProfileDTO.getFirstName());
         user.setLastName(userProfileDTO.getLastName());
@@ -64,7 +64,7 @@ public class UserServiceImpl implements UserService {
             user.setProfilePictureURL(photoUrl);
         }
         userRepository.save(user);
-        UpdatedProfileDTO updatedUserProfileDTO = userToUpdatedProfileDTO(user);
+        ProfileResponseDTO updatedUserProfileDTO = userToUpdatedProfileDTO(user);
         return ResponseEntity.ok(updatedUserProfileDTO);
     }
 
@@ -106,8 +106,8 @@ public class UserServiceImpl implements UserService {
         return mapper.map(user,UserDTO.class);
     }
 
-    private UpdatedProfileDTO userToUpdatedProfileDTO(User user){
-        return mapper.map(user,UpdatedProfileDTO.class);
+    private ProfileResponseDTO userToUpdatedProfileDTO(User user){
+        return mapper.map(user,ProfileResponseDTO.class);
     }
 
     private CustomUserDTO userToCustomUserDTO(User user){

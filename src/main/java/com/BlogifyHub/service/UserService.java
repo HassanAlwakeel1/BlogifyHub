@@ -11,7 +11,7 @@ public interface UserService {
     UserDetailsService userDetailsService();
     ResponseEntity<UserDTO> getUserById(Long userId);
 
-    ResponseEntity<UpdatedProfileDTO> updateUserProfile(UserProfileDTO userProfileDTO, Long userId);
+    ResponseEntity<ProfileResponseDTO> updateUserProfile(UserProfileDTO userProfileDTO, Long userId);
 
     ResponseEntity<String> deleteUser(Long userId);
 
