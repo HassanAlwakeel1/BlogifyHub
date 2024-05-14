@@ -8,6 +8,7 @@ import com.BlogifyHub.model.DTO.ProfileResponseDTO;
 import com.BlogifyHub.model.entity.Category;
 import com.BlogifyHub.model.entity.Post;
 import com.BlogifyHub.model.entity.User;
+import com.BlogifyHub.model.mapper.PostMapper;
 import com.BlogifyHub.repository.CategoryRepository;
 import com.BlogifyHub.repository.PostRepository;
 import com.BlogifyHub.repository.UserRepository;
@@ -28,26 +29,27 @@ public class PostServiceimpl implements PostService {
 
     private PostRepository postRepository;
 
-    private ModelMapper mapper;
-
     private CategoryRepository categoryRepository;
 
     private UserRepository userRepository;
 
+    private PostMapper postMapper;
+
     public PostServiceimpl(PostRepository postRepository,
-                           ModelMapper modelMapper,
                            CategoryRepository categoryRepository,
-                           UserRepository userRepository){
+                           UserRepository userRepository,
+                           PostMapper postMapper){
         this.postRepository = postRepository;
-        this.mapper = modelMapper;
         this.categoryRepository = categoryRepository;
         this.userRepository = userRepository;
+        this.postMapper = postMapper;
     }
 
     @Override
     public PostDTO createPost(PostDTO postDTO, Long userId) {
-        Post post = mapToEntity(postDTO);
-        User user = userRepository.findById(userId).orElseThrow(()-> new ResourceNotFoundException("User","id",userId));
+        Post post = postMapper.mapToEntity(postDTO);
+        User user = userRepository.findById(userId)
+                .orElseThrow(()-> new ResourceNotFoundException("User","id",userId));
         post.setUser(user);
         ProfileResponseDTO profileResponseDTO = new ProfileResponseDTO(
                 user.getId(),
@@ -57,13 +59,16 @@ public class PostServiceimpl implements PostService {
                 user.getProfilePictureURL()
         );
         Post newPost = postRepository.save(post);
-        PostDTO postRespose = mapToDTO(newPost);
+        PostDTO postRespose = postMapper.mapToDTO(newPost);
         postRespose.setProfileResponseDTO(profileResponseDTO);
         return postRespose;
     }
 
     @Override
-    public PostResponseDTO getAllPosts(int pageNumber,int pageSize,String sortBy, String sortDirection) {
+    public PostResponseDTO getAllPosts(int pageNumber,
+                                       int pageSize,
+                                       String sortBy,
+                                       String sortDirection) {
 
         Sort sort = sortDirection.equalsIgnoreCase(Sort.Direction.ASC.name()) ? Sort.by(sortBy).ascending()
                 : Sort.by(sortBy).descending();
@@ -76,7 +81,7 @@ public class PostServiceimpl implements PostService {
 
         List<PostDTO> content = listOfPosts.stream()
                 .map(post -> {
-                    PostDTO postDTO = mapToDTO(post);
+                    PostDTO postDTO = postMapper.mapToDTO(post);
                     User user = post.getUser();
                     ProfileResponseDTO profileResponseDTO = new ProfileResponseDTO(
                             user.getId(),
@@ -114,7 +119,7 @@ public class PostServiceimpl implements PostService {
                 user.getBio(),
                 user.getProfilePictureURL()
         );
-        PostDTO postRespose = mapToDTO(post);
+        PostDTO postRespose = postMapper.mapToDTO(post);
         postRespose.setProfileResponseDTO(profileResponseDTO);
         return postRespose;
     }
@@ -137,7 +142,7 @@ public class PostServiceimpl implements PostService {
                     user.getBio(),
                     user.getProfilePictureURL()
             );
-            PostDTO postRespose = mapToDTO(post);
+            PostDTO postRespose = postMapper.mapToDTO(post);
             postRespose.setProfileResponseDTO(profileResponseDTO);
             return postRespose;
         }
@@ -164,7 +169,8 @@ public class PostServiceimpl implements PostService {
                 .orElseThrow(()-> new ResourceNotFoundException("User","id",userId));
         if (post.getUser().equals(user)){
             postRepository.delete(post);
-        }else throw new BlogAPIException(HttpStatus.FORBIDDEN,"You are not authorized to update this post.");
+        }else throw new BlogAPIException(HttpStatus.FORBIDDEN,
+                "You are not authorized to update this post.");
     }
 
     @Override
@@ -176,7 +182,7 @@ public class PostServiceimpl implements PostService {
 
          List<PostDTO> postDTOList = posts.stream()
                 .map(post -> {
-                    PostDTO postDTO = mapToDTO(post);
+                    PostDTO postDTO = postMapper.mapToDTO(post);
                     User user = post.getUser();
                     ProfileResponseDTO profileResponseDTO = new ProfileResponseDTO(
                             user.getId(),
@@ -190,15 +196,5 @@ public class PostServiceimpl implements PostService {
                 })
                 .collect(Collectors.toList());
          return postDTOList;
-    }
-
-    private PostDTO mapToDTO(Post post){
-        PostDTO postDto = mapper.map(post,PostDTO.class);
-        return postDto;
-    }
-
-    private Post mapToEntity(PostDTO postDTO){
-        Post post = mapper.map(postDTO,Post.class);
-        return post;
     }
 }

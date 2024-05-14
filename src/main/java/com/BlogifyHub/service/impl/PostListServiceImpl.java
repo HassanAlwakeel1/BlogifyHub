@@ -5,21 +5,23 @@ import com.BlogifyHub.model.DTO.PostListDTO;
 import com.BlogifyHub.model.DTO.ProfileResponseDTO;
 import com.BlogifyHub.model.entity.PostList;
 import com.BlogifyHub.model.entity.User;
+import com.BlogifyHub.model.mapper.PostListMapper;
 import com.BlogifyHub.repository.PostListRepository;
 import com.BlogifyHub.repository.UserRepository;
 import com.BlogifyHub.service.PostListService;
-import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
 
 @Service
 public class PostListServiceImpl implements PostListService {
 
-    private ModelMapper mapper;
+    private PostListMapper postListMapper;
     private PostListRepository postListRepository;
     private UserRepository userRepository;
 
-    public PostListServiceImpl(ModelMapper mapper, PostListRepository postListRepository, UserRepository userRepository) {
-        this.mapper = mapper;
+    public PostListServiceImpl(PostListMapper postListMapper,
+                               PostListRepository postListRepository,
+                               UserRepository userRepository) {
+        this.postListMapper = postListMapper;
         this.postListRepository = postListRepository;
         this.userRepository = userRepository;
     }
@@ -28,10 +30,10 @@ public class PostListServiceImpl implements PostListService {
     public PostListDTO createList(long userId, PostListDTO postListDTO) {
         User user = userRepository.findById(userId)
                 .orElseThrow(()-> new ResourceNotFoundException("User","id",userId));
-        PostList postList = mapToEntity(postListDTO);
+        PostList postList = postListMapper.mapToEntity(postListDTO);
         postList.setUser(user);
         PostList createdList = postListRepository.save(postList);
-        PostListDTO listDTO = mapToDTO(createdList);
+        PostListDTO listDTO = postListMapper.mapToDTO(createdList);
         ProfileResponseDTO profileResponseDTO = new ProfileResponseDTO(
                 user.getId(),
                 user.getFirstName(),
@@ -43,10 +45,4 @@ public class PostListServiceImpl implements PostListService {
         return listDTO;
     }
 
-    private PostListDTO mapToDTO(PostList postList){
-        return mapper.map(postList,PostListDTO.class);
     }
-    private PostList mapToEntity(PostListDTO postListDTO){
-        return mapper.map(postListDTO,PostList.class);
-    }
-}

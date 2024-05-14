@@ -26,7 +26,8 @@ public class JWTServiceImpl implements JWTService {
                 .compact();
     }
 
-    public String generateRefreshToken(HashMap<String, Object> extraClaims, UserDetails userDetails) {
+    public String generateRefreshToken(HashMap<String, Object> extraClaims,
+                                       UserDetails userDetails) {
         return Jwts.builder().setClaims(extraClaims).setSubject(userDetails.getUsername())
                 .setIssuedAt(new Date(System.currentTimeMillis()))
                 .setExpiration(new Date(System.currentTimeMillis() + 604800000))
@@ -45,7 +46,10 @@ public class JWTServiceImpl implements JWTService {
         return claimsResolver.apply(claims);
     }
     private Claims extractAllClaims(String token) {
-        return Jwts.parserBuilder().setSigningKey(getSiginKey()).build().parseClaimsJws(token).getBody();
+        return Jwts
+                .parserBuilder()
+                .setSigningKey(getSiginKey()).build().parseClaimsJws(token)
+                .getBody();
     }
     public String extractUserName(String token){
         return extractClaims(token , Claims ::getSubject);

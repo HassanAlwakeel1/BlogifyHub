@@ -3,9 +3,9 @@ package com.BlogifyHub.service.impl;
 import com.BlogifyHub.exception.ResourceNotFoundException;
 import com.BlogifyHub.model.DTO.CategoryDTO;
 import com.BlogifyHub.model.entity.Category;
+import com.BlogifyHub.model.mapper.CategoryMapper;
 import com.BlogifyHub.repository.CategoryRepository;
 import com.BlogifyHub.service.CategoryService;
-import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -15,32 +15,38 @@ import java.util.stream.Collectors;
 public class CategoryServiceImpl implements CategoryService {
 
     private CategoryRepository categoryRepository;
-    private ModelMapper modelMapper;
+    private CategoryMapper categoryMapper;
 
-    public CategoryServiceImpl(CategoryRepository categoryRepository, ModelMapper modelMapper) {
+    public CategoryServiceImpl(CategoryRepository categoryRepository,
+                               CategoryMapper categoryMapper) {
         this.categoryRepository = categoryRepository;
-        this.modelMapper = modelMapper;
+        this.categoryMapper = categoryMapper;
     }
 
     @Override
     public CategoryDTO addCategory(CategoryDTO categoryDTO) {
-        Category category = modelMapper.map(categoryDTO, Category.class);
+        Category category = categoryMapper.categoryDtoToCategory(categoryDTO);
         Category savedCategory =  categoryRepository.save(category);
-        return modelMapper.map(savedCategory, CategoryDTO.class);
+        CategoryDTO categoryDTOResponse = categoryMapper.categoryToCategoryDTO(savedCategory);
+        return categoryDTOResponse;
     }
 
     @Override
     public CategoryDTO getCategory(Long categoryId) {
         Category category = categoryRepository.findById(categoryId)
                 .orElseThrow(()-> new ResourceNotFoundException("Category","id",categoryId));
-        return modelMapper.map(category, CategoryDTO.class);
+        CategoryDTO categoryDTO = categoryMapper.categoryToCategoryDTO(category);
+        return categoryDTO;
     }
 
     @Override
     public List<CategoryDTO> getAllCategories() {
         List<Category> categories = categoryRepository.findAll();
-        return categories.stream().map((category) -> modelMapper.map(category,CategoryDTO.class))
+        List<CategoryDTO> categoryDTOList =  categories
+                .stream()
+                .map((category) -> categoryMapper.categoryToCategoryDTO(category))
                 .collect(Collectors.toList());
+        return categoryDTOList;
     }
 
     @Override
@@ -53,7 +59,8 @@ public class CategoryServiceImpl implements CategoryService {
         category.setDescription(categoryDTO.getDescription());
 
         Category updatedCategory = categoryRepository.save(category);
-        return modelMapper.map(updatedCategory, CategoryDTO.class);
+        CategoryDTO categoryDTOResponse = categoryMapper.categoryToCategoryDTO(updatedCategory);
+        return categoryDTOResponse;
     }
 
     @Override

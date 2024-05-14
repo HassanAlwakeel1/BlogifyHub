@@ -4,12 +4,12 @@ import com.BlogifyHub.exception.ResourceNotFoundException;
 import com.BlogifyHub.model.DTO.*;
 import com.BlogifyHub.model.entity.Post;
 import com.BlogifyHub.model.entity.User;
+import com.BlogifyHub.model.mapper.PostMapper;
+import com.BlogifyHub.model.mapper.UserMapper;
 import com.BlogifyHub.repository.PostRepository;
 import com.BlogifyHub.repository.UserRepository;
 import com.BlogifyHub.service.CloudinaryImageService;
 import com.BlogifyHub.service.UserService;
-import lombok.RequiredArgsConstructor;
-import org.modelmapper.ModelMapper;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -25,19 +25,33 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 @Service
-@RequiredArgsConstructor
 public class UserServiceImpl implements UserService {
 
-    private final UserRepository userRepository;
+    private UserRepository userRepository;
 
-    private final ModelMapper mapper;
+    private CloudinaryImageService cloudinaryImageService;
 
-    private final CloudinaryImageService cloudinaryImageService;
+    private PasswordEncoder passwordEncoder;
 
-    private final PasswordEncoder passwordEncoder;
+    private PostRepository postRepository;
 
-    private final PostRepository postRepository;
+    private  PostMapper postMapper;
 
+    private  UserMapper userMapper;
+
+    public UserServiceImpl(UserRepository userRepository,
+                           CloudinaryImageService cloudinaryImageService,
+                           PasswordEncoder passwordEncoder,
+                           PostRepository postRepository,
+                           PostMapper postMapper,
+                           UserMapper userMapper) {
+        this.userRepository = userRepository;
+        this.cloudinaryImageService = cloudinaryImageService;
+        this.passwordEncoder = passwordEncoder;
+        this.postRepository = postRepository;
+        this.postMapper = postMapper;
+        this.userMapper = userMapper;
+    }
 
     public UserDetailsService userDetailsService(){
         return new UserDetailsService() {
@@ -50,13 +64,14 @@ public class UserServiceImpl implements UserService {
     }
 
     public ResponseEntity<UserDTO> getUserById(Long userId){
-        User user = userRepository.findById(userId).orElseThrow(()-> new ResourceNotFoundException("User","id",userId));
-        UserDTO userDTO = userToUserDTO(user);
+        User user = userRepository.findById(userId)
+                .orElseThrow(()-> new ResourceNotFoundException("User","id",userId));
+        UserDTO userDTO = userMapper.userToUserDTO(user);
         List<Post> listOfPosts = user.getUserPosts();
 
         List<UserPostDTO> userPostDTOs = listOfPosts.stream()
                 .map(post -> {
-                    UserPostDTO postDTO = mapPostToUserPostDTO(post);
+                    UserPostDTO postDTO = postMapper.mapPostToUserPostDTO(post);
                     return postDTO;
                 })
                 .collect(Collectors.toList());
@@ -67,7 +82,9 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public ResponseEntity<ProfileResponseDTO> updateUserProfile(UserProfileDTO userProfileDTO, Long userId) {
-        User user = userRepository.findById(userId).orElseThrow(()-> new ResourceNotFoundException("User","id",userId));
+        User user = userRepository.findById(userId)
+                .orElseThrow(()-> new ResourceNotFoundException("User","id",userId));
+
         user.setFirstName(userProfileDTO.getFirstName());
         user.setLastName(userProfileDTO.getLastName());
         user.setBio(userProfileDTO.getBio());
@@ -78,7 +95,7 @@ public class UserServiceImpl implements UserService {
             user.setProfilePictureURL(photoUrl);
         }
         userRepository.save(user);
-        ProfileResponseDTO updatedUserProfileDTO = userToUpdatedProfileDTO(user);
+        ProfileResponseDTO updatedUserProfileDTO = userMapper.userToUpdatedProfileDTO(user);
         return ResponseEntity.ok(updatedUserProfileDTO);
     }
 
@@ -95,7 +112,7 @@ public class UserServiceImpl implements UserService {
         List<User> users = userRepository.findAll();
         List<CustomUserDTO> customUserDTOS = new ArrayList<>();
         for (User user : users) {
-            CustomUserDTO customUserDTO = userToCustomUserDTO(user);
+            CustomUserDTO customUserDTO = userMapper.userToCustomUserDTO(user);
             customUserDTOS.add(customUserDTO);
         }
         return ResponseEntity.ok(customUserDTOS);
@@ -114,22 +131,6 @@ public class UserServiceImpl implements UserService {
             userRepository.save(user);
             return ResponseEntity.ok("Password changed successfully!");
         }else return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Bad credentials");
-    }
-
-    private UserDTO userToUserDTO(User user){
-        return mapper.map(user,UserDTO.class);
-    }
-
-    private ProfileResponseDTO userToUpdatedProfileDTO(User user){
-        return mapper.map(user,ProfileResponseDTO.class);
-    }
-
-    private CustomUserDTO userToCustomUserDTO(User user){
-        return mapper.map(user,CustomUserDTO.class);
-    }
-
-    private UserPostDTO mapPostToUserPostDTO(Post post){
-        return mapper.map(post,UserPostDTO.class);
     }
 }
 

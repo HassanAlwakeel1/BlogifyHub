@@ -22,7 +22,8 @@ public class LogoutHandlerImpl implements LogoutHandler {
         final String authHeader = request.getHeader("Authorization");
         final String jwt;
 
-        if(!StringUtils.hasText(authHeader) || !org.apache.commons.lang3.StringUtils.startsWith(authHeader,"Bearer ")){
+        if(!StringUtils.hasText(authHeader) ||
+                !org.apache.commons.lang3.StringUtils.startsWith(authHeader,"Bearer ")){
             return;
         }
 
