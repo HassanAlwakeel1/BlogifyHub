@@ -49,14 +49,11 @@ public class SecurityConfiguration {
                 .authenticationProvider(authenticationProvider()).addFilterBefore(
                         jwtAuthenticationFilter , UsernamePasswordAuthenticationFilter.class
                 )
-                .logout()
-                .logoutUrl("/api/v1/auth/logout")
-                .addLogoutHandler(logoutHandler)
-                .logoutSuccessHandler(
-                        (request, response, authentication) ->
-                                SecurityContextHolder.clearContext()
-                )
-
+                .logout(logout -> {
+                    logout.logoutUrl("/api/v1/auth/logout");
+                    logout.addLogoutHandler(logoutHandler);
+                    logout.logoutSuccessHandler(((request, response, authentication) -> SecurityContextHolder.clearContext()));
+                })
         ;
         return http.build();
 
