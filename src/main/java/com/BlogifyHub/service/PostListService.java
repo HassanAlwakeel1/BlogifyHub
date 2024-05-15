@@ -14,5 +14,5 @@ public interface PostListService {
 
     Set<PostListDTO> getUserLists(Long userId);
 
-   /* PostListDTO getListById(Long listId);*/
+    PostListDTO getListById(Long listId);
 }

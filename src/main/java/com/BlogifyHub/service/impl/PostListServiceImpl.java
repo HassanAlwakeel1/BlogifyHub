@@ -161,8 +161,38 @@ public class PostListServiceImpl implements PostListService {
         return postListDTOSet;
     }
 
-   /* @Override
+    @Override
     public PostListDTO getListById(Long listId) {
-        return null;
-    }*/
+        PostList postList = postListRepository.findById(listId).orElseThrow(()-> new ResourceNotFoundException("PostList","id",listId));
+        User user = postList.getUser();
+        PostListDTO postListDTO = postListMapper.mapToDTO(postList);
+        ProfileResponseDTO listOwnerProfile = new ProfileResponseDTO(
+                user.getId(),
+                user.getFirstName(),
+                user.getLastName(),
+                user.getBio(),
+                user.getProfilePictureURL()
+        );
+        postListDTO.setProfileResponseDTO(listOwnerProfile);
+
+        Set<Post> listPosts = postList.getPosts();
+        Set<PostDTO> postDTOSet = listPosts.stream()
+                .map(postEntity -> {
+                    User postUser = postEntity.getUser();
+                    PostDTO postDTO = postMapper.mapToDTO(postEntity);
+                    ProfileResponseDTO postOwnerProfile = new ProfileResponseDTO(
+                            postUser.getId(),
+                            postUser.getFirstName(),
+                            postUser.getLastName(),
+                            postUser.getBio(),
+                            postUser.getProfilePictureURL()
+                    );
+                    postDTO.setProfileResponseDTO(postOwnerProfile);
+                    return postDTO;
+                })
+                .collect(Collectors.toSet());
+
+        postListDTO.setPostDTO(postDTOSet);
+        return postListDTO;
+    }
 }

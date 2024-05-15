@@ -43,9 +43,10 @@ public class PostListController {
         return postListDTOSet;
     }
 
-   /* @GetMapping
-    public PostListDTO getListById(@PathVariable(name = "id") Long listId){
+    @GetMapping("/{listId}")
+    public PostListDTO getListById(@PathVariable(name = "listId") Long listId,
+                                   @PathVariable(name = "id") Long userId){
         PostListDTO postListDTO = postListService.getListById(listId);
         return postListDTO;
-    }*/
+    }
 }
