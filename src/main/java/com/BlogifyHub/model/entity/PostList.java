@@ -8,9 +8,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-import java.util.Date;
-import java.util.HashSet;
-import java.util.Set;
+import java.util.*;
 
 @Entity
 @Table(name = "post_list")
@@ -35,6 +33,12 @@ public class PostList {
     @JoinColumn(name = "post_list_id",nullable = false)
     @JsonBackReference
     private User user;
+
+    @ManyToMany(fetch = FetchType.LAZY)
+    @JoinTable(name = "postlist_posts",
+            joinColumns = @JoinColumn(name = "postlist_id"),
+            inverseJoinColumns = @JoinColumn(name = "post_id"))
+    private Set<Post> posts = new HashSet<>();
 
     @PrePersist
     protected void onCreate() {

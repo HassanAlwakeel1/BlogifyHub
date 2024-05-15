@@ -22,4 +22,10 @@ public class PostListController {
         PostListDTO listDTO = postListService.createList(userId,postListDTO);
         return ResponseEntity.status(HttpStatus.CREATED).body(listDTO);
     }
+    @PostMapping("/{listId}/posts/{postId}")
+    public PostListDTO savePost(@PathVariable(name = "id") Long userId,
+                                @PathVariable(name = "listId") long listId,
+                                @PathVariable(name= "postId") long postId){
+        return postListService.savePost(userId,listId,postId);
+    }
 }

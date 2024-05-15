@@ -8,6 +8,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.util.Date;
+import java.util.Set;
 
 @Setter
 @Getter
@@ -20,5 +21,5 @@ public class PostListDTO {
     private String description;
     private Date createdAt;
     private ListStatus listStatus;
-
+    private Set<PostDTO> postDTO;
 }

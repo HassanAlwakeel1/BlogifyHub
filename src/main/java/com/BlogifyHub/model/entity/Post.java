@@ -40,4 +40,7 @@ public class Post {
     @JsonBackReference
     private User user;
 
+    @ManyToMany(mappedBy = "posts",fetch = FetchType.LAZY)
+    private Set<PostList> postLists = new HashSet<>();
+
 }
