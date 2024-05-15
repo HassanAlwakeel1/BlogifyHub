@@ -108,4 +108,61 @@ public class PostListServiceImpl implements PostListService {
         postListDTO.setPostDTO(postDTOSet);
         return postListDTO;
     }
+
+    @Override
+    public String deleteList(Long userId, long listId) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(()-> new ResourceNotFoundException("user","id",userId));
+        PostList postList = postListRepository.findById(listId)
+                .orElseThrow(()-> new ResourceNotFoundException("postList","id",listId));
+        postListRepository.delete(postList);
+        return "List deleted Successfully";
+    }
+
+    @Override
+    public Set<PostListDTO> getUserLists(Long userId) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(()-> new ResourceNotFoundException("user","id",userId));
+        Set<PostList> postListSet = postListRepository.findByUserId(userId);
+        Set<PostListDTO> postListDTOSet = postListSet.stream()
+                .map(postListEntity->{
+                    PostListDTO postListDTO = postListMapper.mapToDTO(postListEntity);
+                    ProfileResponseDTO listOwnerProfile = new ProfileResponseDTO(
+                            user.getId(),
+                            user.getFirstName(),
+                            user.getLastName(),
+                            user.getBio(),
+                            user.getProfilePictureURL()
+                    );
+                    postListDTO.setProfileResponseDTO(listOwnerProfile);
+
+                    Set<Post> listPosts = postListEntity.getPosts();
+
+                    Set<PostDTO> postDTOSet = listPosts.stream()
+                            .map(postEntity -> {
+                                User postUser = postEntity.getUser();
+                                PostDTO postDTO = postMapper.mapToDTO(postEntity);
+                                ProfileResponseDTO postOwnerProfile = new ProfileResponseDTO(
+                                        postUser.getId(),
+                                        postUser.getFirstName(),
+                                        postUser.getLastName(),
+                                        postUser.getBio(),
+                                        postUser.getProfilePictureURL()
+                                );
+                                postDTO.setProfileResponseDTO(postOwnerProfile);
+                                return postDTO;
+                            })
+                            .collect(Collectors.toSet());
+
+                    postListDTO.setPostDTO(postDTOSet);
+                    return postListDTO;
+                })
+                .collect(Collectors.toSet());
+        return postListDTOSet;
+    }
+
+   /* @Override
+    public PostListDTO getListById(Long listId) {
+        return null;
+    }*/
 }

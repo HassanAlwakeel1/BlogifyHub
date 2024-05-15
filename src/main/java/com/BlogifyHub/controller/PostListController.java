@@ -7,6 +7,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.Set;
+
 @RestController
 @RequestMapping("api/users/{id}/post-lists")
 public class PostListController {
@@ -28,4 +30,22 @@ public class PostListController {
                                 @PathVariable(name= "postId") long postId){
         return postListService.savePost(userId,listId,postId);
     }
+
+    @DeleteMapping("/{listId}")
+    public String deleteList(@PathVariable(name = "id") Long userId,
+                             @PathVariable(name = "listId") long listId){
+        return postListService.deleteList(userId,listId);
+    }
+
+    @GetMapping
+    public Set<PostListDTO> getUserLists(@PathVariable(name = "id") Long userId){
+        Set<PostListDTO> postListDTOSet = postListService.getUserLists(userId);
+        return postListDTOSet;
+    }
+
+   /* @GetMapping
+    public PostListDTO getListById(@PathVariable(name = "id") Long listId){
+        PostListDTO postListDTO = postListService.getListById(listId);
+        return postListDTO;
+    }*/
 }
