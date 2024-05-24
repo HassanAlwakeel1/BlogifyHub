@@ -10,6 +10,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 
 import java.security.Key;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.function.Function;
 
@@ -19,9 +20,16 @@ import java.util.HashMap;
 @Service
 public class JWTServiceImpl implements JWTService {
     public String generateToken(UserDetails userDetails){
+
+        //Set expiration time to 3 months
+        Calendar calendar = Calendar.getInstance();
+        calendar.setTime(new Date());
+        calendar.add(Calendar.MONTH, 3);
+        Date expirationDate = calendar.getTime();
+
         return Jwts.builder().setSubject(userDetails.getUsername())
                 .setIssuedAt(new Date(System.currentTimeMillis()))
-                .setExpiration(new Date(System.currentTimeMillis() + 1000 * 60 * 24))
+                .setExpiration(expirationDate)
                 .signWith(getSiginKey() , SignatureAlgorithm.HS256)
                 .compact();
     }
