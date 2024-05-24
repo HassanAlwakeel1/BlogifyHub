@@ -7,6 +7,7 @@ import com.BlogifyHub.model.DTO.ProfileResponseDTO;
 import com.BlogifyHub.model.entity.Comment;
 import com.BlogifyHub.model.entity.Post;
 import com.BlogifyHub.model.entity.User;
+import com.BlogifyHub.model.entity.enums.Role;
 import com.BlogifyHub.model.mapper.CommentMapper;
 import com.BlogifyHub.repository.CommentRepository;
 import com.BlogifyHub.repository.PostRepository;
@@ -99,11 +100,36 @@ public class CommentServiceImpl implements CommentService {
         if (!comment.getPost().getId().equals(post.getId())){
             throw new BlogAPIException(HttpStatus.BAD_REQUEST, "Comment does not belong to post");
         }
-        return commentMapper.mapToDTO(comment);
+        CommentDTO commentDTO = commentMapper.mapToDTO(comment);
+
+        User user = comment.getUser();
+        ProfileResponseDTO profileResponseDTO = new ProfileResponseDTO(
+                user.getId(),
+                user.getFirstName(),
+                user.getLastName(),
+                user.getBio(),
+                user.getProfilePictureURL(),
+                user.getFollowersNumber()
+        );
+        commentDTO.setProfileResponseDTO(profileResponseDTO);
+
+        return commentDTO;
     }
 
     @Override
-    public CommentDTO updateComment(long postId, long commentId, CommentDTO commentDTO) {
+    public CommentDTO updateComment(long postId, long commentId, CommentDTO commentDTO, Authentication authentication) {
+        String email = authentication.getName();
+        User user = userRepository.findByEmail(email)
+                .orElseThrow(()-> new UsernameNotFoundException(email));
+
+        ProfileResponseDTO profileResponseDTO = new ProfileResponseDTO(
+                user.getId(),
+                user.getFirstName(),
+                user.getLastName(),
+                user.getBio(),
+                user.getProfilePictureURL(),
+                user.getFollowersNumber()
+        );
         Post post = postRepository.findById(postId)
                 .orElseThrow(()-> new ResourceNotFoundException("Post","id",postId));
 
@@ -115,11 +141,23 @@ public class CommentServiceImpl implements CommentService {
         }
         comment.setBody(commentDTO.getBody());
         Comment updatedComment = commentRepository.save(comment);
-        return commentMapper.mapToDTO(updatedComment);
+        CommentDTO updatedCommentDTO = commentMapper.mapToDTO(updatedComment);
+        updatedCommentDTO.setProfileResponseDTO(profileResponseDTO);
+        return updatedCommentDTO;
     }
 
+    /**
+     * in this context, Authentication refers to the currently logged-in user.
+     * The Authentication object provides details about the authenticated user making the request.
+     * When you call authentication.getName(), it returns the email (or username) of the logged-in user.
+     * This user might be the owner of the comment, the owner of the post, or an admin.
+     * */
     @Override
-    public void deleteComment(Long postId, Long commentId) {
+    public void deleteComment(Long postId, Long commentId, Authentication authentication) {
+        String email = authentication.getName();
+        User user = userRepository.findByEmail(email)
+                .orElseThrow(()-> new UsernameNotFoundException(email));
+
         Post post = postRepository.findById(postId)
                 .orElseThrow(()-> new ResourceNotFoundException("Post","id",postId));
 
@@ -128,6 +166,14 @@ public class CommentServiceImpl implements CommentService {
 
         if (!comment.getPost().getId().equals(post.getId())){
             throw new BlogAPIException(HttpStatus.BAD_REQUEST, "Comment does not belong to post");
+        }
+
+        boolean isAdmin = user.getRole() == Role.ADMIN;
+        boolean isCommentOwner = user.equals(comment.getUser());
+        boolean isPostOwner = user.equals(post.getUser());
+
+        if (!isAdmin && !isCommentOwner && !isPostOwner) {
+            throw new BlogAPIException(HttpStatus.UNAUTHORIZED, "You are not authorized to delete this comment");
         }
         commentRepository.deleteById(commentId);
     }

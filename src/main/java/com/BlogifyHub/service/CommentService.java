@@ -12,7 +12,7 @@ public interface CommentService {
 
     CommentDTO getCommentById(long postId, long commentId);
 
-    CommentDTO updateComment(long postId, long commentId, CommentDTO commentDTO);
+    CommentDTO updateComment(long postId, long commentId, CommentDTO commentDTO, Authentication authentication);
 
-    void deleteComment(Long postId, Long commentId);
+    void deleteComment(Long postId, Long commentId, Authentication authentication);
 }
