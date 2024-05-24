@@ -79,6 +79,12 @@ public class User implements UserDetails {
     @JsonManagedReference
     private List<Follow> followers;
 
+    @Column(name = "followers_number", columnDefinition = "int default 0")
+    private Integer followersNumber;
+
+    @Column(name = "following_number", columnDefinition = "int default 0")
+    private Integer followingNumber;
+
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
         return List.of(new SimpleGrantedAuthority(role.name()));

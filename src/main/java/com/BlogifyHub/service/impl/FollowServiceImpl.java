@@ -41,6 +41,14 @@ public class FollowServiceImpl implements FollowService {
         follow.setFollower(follower);
         follow.setFollowedUser(followedUser);
         followRepository.save(follow);
+
+        // Increment followersNumber of the followed user
+        followedUser.setFollowersNumber(followedUser.getFollowersNumber() + 1);
+        userRepository.save(followedUser);
+
+        // Increment followingNumber of the follower
+        follower.setFollowingNumber(follower.getFollowingNumber() + 1);
+        userRepository.save(follower);
     }
 
     @Override
@@ -54,6 +62,14 @@ public class FollowServiceImpl implements FollowService {
         if (isFollowed(follower,followedUser)){
             Follow follow = followRepository.findByFollowerAndFollowedUser(follower,followedUser);
             followRepository.delete(follow);
+
+            // Decrement followersNumber of the followed user
+            followedUser.setFollowersNumber(followedUser.getFollowersNumber() - 1);
+            userRepository.save(followedUser);
+
+            // Decrement followingNumber of the follower
+            follower.setFollowingNumber(follower.getFollowingNumber() - 1);
+            userRepository.save(follower);
         }else throw new RuntimeException("Your are not following this person to unfollow him");
     }
 
