@@ -79,11 +79,11 @@ public class User implements UserDetails {
     @JsonManagedReference
     private List<Follow> followers;
 
-    @Column(name = "followers_number", columnDefinition = "int default 0")
-    private Integer followersNumber;
+    @Column(name = "followers_number")
+    private Integer followersNumber = 0;
 
-    @Column(name = "following_number", columnDefinition = "int default 0")
-    private Integer followingNumber;
+    @Column(name = "following_number")
+    private Integer followingNumber = 0;
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {

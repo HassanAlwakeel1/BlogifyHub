@@ -6,6 +6,7 @@ import com.BlogifyHub.service.CommentService;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -21,8 +22,9 @@ public class CommentController {
 
     @PostMapping("/posts/{postId}/comments")
     public ResponseEntity<CommentDTO> createComment(@PathVariable(value = "postId") long postId,
-                                                    @Valid @RequestBody CommentDTO commentDTO){
-        return new ResponseEntity<>(commentService.createComment(postId,commentDTO), HttpStatus.CREATED);
+                                                    @Valid @RequestBody CommentDTO commentDTO,
+                                                    Authentication authentication){
+        return new ResponseEntity<>(commentService.createComment(postId, commentDTO, authentication), HttpStatus.CREATED);
     }
 
     @GetMapping("/posts/{postId}/comments")
