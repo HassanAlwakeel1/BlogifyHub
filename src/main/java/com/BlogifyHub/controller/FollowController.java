@@ -1,11 +1,14 @@
 package com.BlogifyHub.controller;
 
+import com.BlogifyHub.model.DTO.ProfileDTO;
 import com.BlogifyHub.service.FollowService;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 
 @RestController
@@ -28,4 +31,10 @@ public class FollowController {
         followService.unFollow(userId, authentication);
         return new ResponseEntity<>(HttpStatus.OK);
     }
+
+    @GetMapping("/{id}")
+    public ResponseEntity<List<ProfileDTO>> getFollowers(@PathVariable(name = "id") Long userId){
+        return ResponseEntity.ok(followService.getFollowers(userId));
+    }
+
 }
