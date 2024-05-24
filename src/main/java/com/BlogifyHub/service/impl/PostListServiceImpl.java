@@ -54,7 +54,8 @@ public class PostListServiceImpl implements PostListService {
                 user.getFirstName(),
                 user.getLastName(),
                 user.getBio(),
-                user.getProfilePictureURL()
+                user.getProfilePictureURL(),
+                user.getFollowersNumber()
         );
         listDTO.setProfileResponseDTO(profileResponseDTO);
         return listDTO;
@@ -85,7 +86,8 @@ public class PostListServiceImpl implements PostListService {
                 user.getFirstName(),
                 user.getLastName(),
                 user.getBio(),
-                user.getProfilePictureURL()
+                user.getProfilePictureURL(),
+                user.getFollowersNumber()
         );
         postListDTO.setProfileResponseDTO(listOwnerProfile);
 
@@ -98,7 +100,8 @@ public class PostListServiceImpl implements PostListService {
                             postUser.getFirstName(),
                             postUser.getLastName(),
                             postUser.getBio(),
-                            postUser.getProfilePictureURL()
+                            postUser.getProfilePictureURL(),
+                            postUser.getFollowersNumber()
                     );
                     postDTO.setProfileResponseDTO(postOwnerProfile);
                     return postDTO;
@@ -132,7 +135,8 @@ public class PostListServiceImpl implements PostListService {
                             user.getFirstName(),
                             user.getLastName(),
                             user.getBio(),
-                            user.getProfilePictureURL()
+                            user.getProfilePictureURL(),
+                            user.getFollowersNumber()
                     );
                     postListDTO.setProfileResponseDTO(listOwnerProfile);
 
@@ -147,7 +151,8 @@ public class PostListServiceImpl implements PostListService {
                                         postUser.getFirstName(),
                                         postUser.getLastName(),
                                         postUser.getBio(),
-                                        postUser.getProfilePictureURL()
+                                        postUser.getProfilePictureURL(),
+                                        postUser.getFollowersNumber()
                                 );
                                 postDTO.setProfileResponseDTO(postOwnerProfile);
                                 return postDTO;
@@ -171,7 +176,8 @@ public class PostListServiceImpl implements PostListService {
                 user.getFirstName(),
                 user.getLastName(),
                 user.getBio(),
-                user.getProfilePictureURL()
+                user.getProfilePictureURL(),
+                user.getFollowersNumber()
         );
         postListDTO.setProfileResponseDTO(listOwnerProfile);
 
@@ -185,7 +191,8 @@ public class PostListServiceImpl implements PostListService {
                             postUser.getFirstName(),
                             postUser.getLastName(),
                             postUser.getBio(),
-                            postUser.getProfilePictureURL()
+                            postUser.getProfilePictureURL(),
+                            postUser.getFollowersNumber()
                     );
                     postDTO.setProfileResponseDTO(postOwnerProfile);
                     return postDTO;

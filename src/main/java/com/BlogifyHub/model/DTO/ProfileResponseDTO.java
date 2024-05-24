@@ -3,7 +3,6 @@ package com.BlogifyHub.model.DTO;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import org.springframework.web.multipart.MultipartFile;
 
 @Data
 @AllArgsConstructor
@@ -14,4 +13,5 @@ public class ProfileResponseDTO {
     private String lastName;
     private String Bio;
     private String ProfilePictureURL;
+    private Integer followersNumber;
 }

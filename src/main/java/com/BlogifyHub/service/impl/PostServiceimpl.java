@@ -56,7 +56,8 @@ public class PostServiceimpl implements PostService {
                 user.getFirstName(),
                 user.getLastName(),
                 user.getBio(),
-                user.getProfilePictureURL()
+                user.getProfilePictureURL(),
+                user.getFollowersNumber()
         );
         Post newPost = postRepository.save(post);
         PostDTO postRespose = postMapper.mapToDTO(newPost);
@@ -88,7 +89,8 @@ public class PostServiceimpl implements PostService {
                             user.getFirstName(),
                             user.getLastName(),
                             user.getBio(),
-                            user.getProfilePictureURL()
+                            user.getProfilePictureURL(),
+                            user.getFollowersNumber()
                     );
                     postDTO.setProfileResponseDTO(profileResponseDTO);
                     return postDTO;
@@ -117,7 +119,8 @@ public class PostServiceimpl implements PostService {
                 user.getFirstName(),
                 user.getLastName(),
                 user.getBio(),
-                user.getProfilePictureURL()
+                user.getProfilePictureURL(),
+                user.getFollowersNumber()
         );
         PostDTO postRespose = postMapper.mapToDTO(post);
         postRespose.setProfileResponseDTO(profileResponseDTO);
@@ -140,7 +143,8 @@ public class PostServiceimpl implements PostService {
                     user.getFirstName(),
                     user.getLastName(),
                     user.getBio(),
-                    user.getProfilePictureURL()
+                    user.getProfilePictureURL(),
+                    user.getFollowersNumber()
             );
             PostDTO postRespose = postMapper.mapToDTO(post);
             postRespose.setProfileResponseDTO(profileResponseDTO);
@@ -189,7 +193,8 @@ public class PostServiceimpl implements PostService {
                             user.getFirstName(),
                             user.getLastName(),
                             user.getBio(),
-                            user.getProfilePictureURL()
+                            user.getProfilePictureURL(),
+                            user.getFollowersNumber()
                     );
                     postDTO.setProfileResponseDTO(profileResponseDTO);
                     return postDTO;
