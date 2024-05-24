@@ -85,6 +85,10 @@ public class User implements UserDetails {
     @Column(name = "following_number")
     private Integer followingNumber = 0;
 
+    @OneToMany(mappedBy = "mutedUser", cascade = CascadeType.REMOVE)
+    @JsonManagedReference
+    private List<Mute> mutedUser;
+
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
         return List.of(new SimpleGrantedAuthority(role.name()));
