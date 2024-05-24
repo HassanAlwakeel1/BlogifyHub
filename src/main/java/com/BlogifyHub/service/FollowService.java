@@ -2,6 +2,7 @@ package com.BlogifyHub.service;
 
 
 import com.BlogifyHub.model.DTO.ProfileDTO;
+import com.BlogifyHub.model.DTO.ProfileResponseDTO;
 import com.BlogifyHub.model.entity.User;
 import org.springframework.security.core.Authentication;
 
@@ -12,5 +13,5 @@ public interface FollowService {
 
     void unFollow(Long userId, Authentication authentication);
 
-    List<ProfileDTO> getFollowers(Long userId);
+    List<ProfileResponseDTO> getFollowers(Long userId);
 }

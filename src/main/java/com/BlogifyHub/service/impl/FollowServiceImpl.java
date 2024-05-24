@@ -2,6 +2,7 @@ package com.BlogifyHub.service.impl;
 
 import com.BlogifyHub.exception.ResourceNotFoundException;
 import com.BlogifyHub.model.DTO.ProfileDTO;
+import com.BlogifyHub.model.DTO.ProfileResponseDTO;
 import com.BlogifyHub.model.entity.Follow;
 import com.BlogifyHub.model.entity.User;
 import com.BlogifyHub.model.mapper.UserMapper;
@@ -88,7 +89,7 @@ public class FollowServiceImpl implements FollowService {
     }
 
     @Override
-    public List<ProfileDTO> getFollowers(Long userId) {
+    public List<ProfileResponseDTO> getFollowers(Long userId) {
         User user = userRepository.findById(userId)
                 .orElseThrow(()-> new ResourceNotFoundException("User","id",userId));
         List<Follow> followList = followRepository.findByFollowedUser(user);
@@ -96,8 +97,8 @@ public class FollowServiceImpl implements FollowService {
                 .map(Follow::getFollower)
                 .collect(Collectors.toList());
 
-        List<ProfileDTO> followersProfileDTOs = followers.stream()
-                .map(userMapper::userToProfileDTO)
+        List<ProfileResponseDTO> followersProfileDTOs = followers.stream()
+                .map(userMapper::userToUpdatedProfileDTO)
                 .collect(Collectors.toList());
         return followersProfileDTOs;
     }

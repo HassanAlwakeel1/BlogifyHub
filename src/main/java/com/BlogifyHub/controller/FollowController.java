@@ -1,6 +1,7 @@
 package com.BlogifyHub.controller;
 
 import com.BlogifyHub.model.DTO.ProfileDTO;
+import com.BlogifyHub.model.DTO.ProfileResponseDTO;
 import com.BlogifyHub.service.FollowService;
 
 import org.springframework.http.HttpStatus;
@@ -33,7 +34,7 @@ public class FollowController {
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<List<ProfileDTO>> getFollowers(@PathVariable(name = "id") Long userId){
+    public ResponseEntity<List<ProfileResponseDTO>> getFollowers(@PathVariable(name = "id") Long userId){
         return ResponseEntity.ok(followService.getFollowers(userId));
     }
 
