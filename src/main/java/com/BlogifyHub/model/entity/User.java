@@ -75,6 +75,10 @@ public class User implements UserDetails {
     @JsonManagedReference
     private List<PostList> userPostLists;
 
+    @OneToMany(mappedBy = "followedUser", cascade = CascadeType.REMOVE)
+    @JsonManagedReference
+    private List<Follow> followers;
+
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
         return List.of(new SimpleGrantedAuthority(role.name()));
