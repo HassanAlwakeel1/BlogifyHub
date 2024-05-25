@@ -14,8 +14,7 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
-import java.util.Collection;
-import java.util.List;
+import java.util.*;
 
 @Entity
 @Table(name = "app_users")
@@ -88,6 +87,10 @@ public class User implements UserDetails {
     @OneToMany(mappedBy = "mutedUser", cascade = CascadeType.REMOVE)
     @JsonManagedReference
     private List<Mute> mutedUser;
+
+    @OneToMany(mappedBy = "user",cascade = CascadeType.REMOVE)
+    @JsonManagedReference
+    private List<PostClap> postClaps;
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {

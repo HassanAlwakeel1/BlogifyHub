@@ -1,10 +1,13 @@
 package com.BlogifyHub.model.entity;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 import lombok.*;
 
+import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 @Setter
@@ -42,5 +45,15 @@ public class Post {
 
     @ManyToMany(mappedBy = "posts",fetch = FetchType.LAZY)
     private Set<PostList> postLists = new HashSet<>();
+
+    @OneToMany(mappedBy = "post",cascade = CascadeType.REMOVE)
+    @JsonManagedReference
+    private List<PostClap> postClaps;
+
+    @Column(name = "number_of_claps")
+    private Integer numberOfClaps = 0;
+
+    @Column(name = "number_of_clappers")
+    private Integer numberOfClappers = 0;
 
 }
