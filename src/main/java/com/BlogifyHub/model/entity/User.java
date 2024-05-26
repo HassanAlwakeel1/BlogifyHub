@@ -92,6 +92,10 @@ public class User implements UserDetails {
     @JsonManagedReference
     private List<PostClap> postClaps;
 
+    @OneToMany(mappedBy = "user",cascade = CascadeType.REMOVE)
+    @JsonManagedReference
+    private List<CommentClap> commentClaps;
+
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
         return List.of(new SimpleGrantedAuthority(role.name()));

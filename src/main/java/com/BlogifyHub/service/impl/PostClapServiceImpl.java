@@ -8,6 +8,7 @@ import com.BlogifyHub.repository.PostClapRepository;
 import com.BlogifyHub.repository.PostRepository;
 import com.BlogifyHub.repository.UserRepository;
 import com.BlogifyHub.service.ClapService;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
@@ -15,6 +16,7 @@ import org.springframework.stereotype.Service;
 import java.util.Optional;
 
 @Service
+@Qualifier("postClapService")
 public class PostClapServiceImpl implements ClapService {
     private UserRepository userRepository;
 
@@ -39,7 +41,7 @@ public class PostClapServiceImpl implements ClapService {
                 .orElseThrow(()-> new ResourceNotFoundException("Post","id",postId));
 
         if (user.equals(post.getUser())){
-            throw new RuntimeException("You can't calp to your own post.");
+            throw new RuntimeException("You can't clap to your own post.");
         }
 
         Optional<PostClap> optionalClap = postClapRepository.findByUserAndPost(user,post);
@@ -47,7 +49,7 @@ public class PostClapServiceImpl implements ClapService {
         if (optionalClap.isPresent()){
             clap = optionalClap.get();
             if (clap.getNumberOfClaps() >= 50) {
-                throw new RuntimeException("User has already clapped 50 times on this post");
+                throw new RuntimeException("You can't clap more than 50 times on the same post.");
             }
             clap.setNumberOfClaps(clap.getNumberOfClaps() + 1);
         }else {
