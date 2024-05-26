@@ -38,6 +38,10 @@ public class PostClapServiceImpl implements ClapService {
         Post post = postRepository.findById(postId)
                 .orElseThrow(()-> new ResourceNotFoundException("Post","id",postId));
 
+        if (user.equals(post.getUser())){
+            throw new RuntimeException("You can't calp to your own post.");
+        }
+
         Optional<PostClap> optionalClap = postClapRepository.findByUserAndPost(user,post);
         PostClap clap;
         if (optionalClap.isPresent()){
