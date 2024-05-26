@@ -1,9 +1,8 @@
 package com.BlogifyHub.service.impl;
 
 import com.BlogifyHub.exception.ResourceNotFoundException;
-import com.BlogifyHub.model.entity.Comment;
-import com.BlogifyHub.model.entity.CommentClap;
-import com.BlogifyHub.model.entity.User;
+import com.BlogifyHub.model.DTO.ProfileResponseDTO;
+import com.BlogifyHub.model.entity.*;
 import com.BlogifyHub.repository.CommentClapRepository;
 import com.BlogifyHub.repository.CommentRepository;
 import com.BlogifyHub.repository.UserRepository;
@@ -13,7 +12,10 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
 @Qualifier("commentClapService")
@@ -79,5 +81,32 @@ public class CommentClapServiceImpl implements ClapService {
             commentClapRepository.delete(clap);
             commentRepository.save(comment);
         }else throw new RuntimeException("Clap not found");
+    }
+
+    @Override
+    public List<ProfileResponseDTO> getClappers(Long commentId) {
+        Comment comment = commentRepository.findById(commentId)
+                .orElseThrow(()->new ResourceNotFoundException("Post","postId",commentId));
+        List<CommentClap> commentClaps = new ArrayList<>();
+        commentClaps = comment.getCommentClaps();
+        List<User> users = commentClaps.stream()
+                .map(CommentClap::getUser)
+                .collect(Collectors.toList());
+        List<ProfileResponseDTO> profileResponseDTOS = users.stream()
+                .map(this::mapToProfileResponseDTO)
+                .collect(Collectors.toList());
+
+        return profileResponseDTOS;
+    }
+
+    private ProfileResponseDTO mapToProfileResponseDTO(User user) {
+        return new ProfileResponseDTO(
+                user.getId(),
+                user.getFirstName(),
+                user.getLastName(),
+                user.getBio(),
+                user.getProfilePictureURL(),
+                user.getFollowersNumber()
+        );
     }
 }

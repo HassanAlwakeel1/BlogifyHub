@@ -1,6 +1,7 @@
 package com.BlogifyHub.service.impl;
 
 import com.BlogifyHub.exception.ResourceNotFoundException;
+import com.BlogifyHub.model.DTO.ProfileResponseDTO;
 import com.BlogifyHub.model.entity.Post;
 import com.BlogifyHub.model.entity.PostClap;
 import com.BlogifyHub.model.entity.User;
@@ -13,7 +14,11 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 @Service
 @Qualifier("postClapService")
@@ -83,5 +88,33 @@ public class PostClapServiceImpl implements ClapService {
             postRepository.save(post);
         }else throw new RuntimeException("Clap not found");
     }
+
+    @Override
+    public List<ProfileResponseDTO> getClappers(Long postId) {
+        Post post = postRepository.findById(postId)
+                .orElseThrow(()->new ResourceNotFoundException("Post","postId",postId));
+        List<PostClap> postClaps = new ArrayList<>();
+        postClaps = post.getPostClaps();
+        List<User> users = postClaps.stream()
+                .map(PostClap::getUser)
+                .collect(Collectors.toList());
+        List<ProfileResponseDTO> profileResponseDTOS = users.stream()
+                .map(this::mapToProfileResponseDTO)
+                .collect(Collectors.toList());
+
+        return profileResponseDTOS;
+    }
+
+    private ProfileResponseDTO mapToProfileResponseDTO(User user) {
+        return new ProfileResponseDTO(
+                user.getId(),
+                user.getFirstName(),
+                user.getLastName(),
+                user.getBio(),
+                user.getProfilePictureURL(),
+                user.getFollowersNumber()
+        );
+    }
+
 
 }
