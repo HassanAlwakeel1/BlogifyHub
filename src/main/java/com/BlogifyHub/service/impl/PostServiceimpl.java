@@ -148,6 +148,7 @@ public class PostServiceimpl implements PostService {
             );
             PostDTO postRespose = postMapper.mapToDTO(post);
             postRespose.setProfileResponseDTO(profileResponseDTO);
+            postRepository.save(post);
             return postRespose;
         }
         /**
