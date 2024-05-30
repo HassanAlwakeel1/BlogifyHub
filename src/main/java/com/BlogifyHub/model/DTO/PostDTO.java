@@ -1,5 +1,6 @@
 package com.BlogifyHub.model.DTO;
 
+import com.BlogifyHub.model.entity.enums.PostType;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.Size;
 import lombok.AllArgsConstructor;
@@ -32,5 +33,7 @@ public class PostDTO {
     private Set<CommentDTO> comments;
 
     private Long categoryId;
+
+    private PostType postType;
 
 }

@@ -1,5 +1,6 @@
 package com.BlogifyHub.model.entity;
 
+import com.BlogifyHub.model.entity.enums.PostType;
 import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
@@ -65,5 +66,12 @@ public class Post {
     @UpdateTimestamp
     @Column(name = "updated_at")
     private LocalDateTime updatedAt;
+
+    @Column(name = "expected_reading_time")
+    private Integer expectedReadingTime;
+
+    @Column(name = "post_type")
+    @Enumerated(EnumType.STRING)
+    private PostType postType;
 
 }
