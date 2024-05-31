@@ -6,12 +6,16 @@ import com.BlogifyHub.model.DTO.SignInRequest;
 import com.BlogifyHub.model.DTO.SignUpRequest;
 import com.BlogifyHub.model.entity.Token;
 import com.BlogifyHub.model.entity.User;
+import com.BlogifyHub.model.entity.VerificationToken;
 import com.BlogifyHub.model.entity.enums.TokenType;
 import com.BlogifyHub.repository.TokenRepository;
 import com.BlogifyHub.repository.UserRepository;
 import com.BlogifyHub.service.AuthenticationService;
 import com.BlogifyHub.service.JWTService;
+import com.BlogifyHub.service.VerificationTokenService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.mail.SimpleMailMessage;
+import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -33,6 +37,10 @@ public class AuthenticationServiceImpl implements AuthenticationService {
 
     private final TokenRepository tokenRepository;
 
+    private final VerificationTokenService tokenService;
+
+    private final JavaMailSender mailSender;
+
     public JwtAuthenticationResponse signup(SignUpRequest signUpRequest){
         User user = new User();
         user.setFirstName(signUpRequest.getFirstName());
@@ -41,8 +49,15 @@ public class AuthenticationServiceImpl implements AuthenticationService {
         user.setRole(signUpRequest.getRole());
         user.setBio(signUpRequest.getBio());
         user.setPassword(passwordEncoder.encode(signUpRequest.getPassword()));
+        user.setEnabled(false); // Set user as not enabled
 
         var savedUser = userRepository.save(user);
+
+        // Create verification token
+        VerificationToken token = tokenService.createToken(savedUser);
+
+        // Send verification email
+        sendVerificationEmail(savedUser, token.getToken());
         var jwtToken = jwtService.generateToken(user);
         var jwtRefreshToken = jwtService.generateRefreshToken(new HashMap<>(),user);
         saveUserToken(savedUser, jwtToken);
@@ -51,6 +66,14 @@ public class AuthenticationServiceImpl implements AuthenticationService {
                 .token(jwtToken)
                 .refreshToken(jwtRefreshToken)
                 .build();
+    }
+    private void sendVerificationEmail(User user, String token) {
+        String url = "http://localhost:8080/api/v1/auth/verify?token=" + token;
+        SimpleMailMessage email = new SimpleMailMessage();
+        email.setTo(user.getEmail());
+        email.setSubject("Verify your email");
+        email.setText("Click the following link to verify your email: " + url);
+        mailSender.send(email);
     }
 
     private void saveUserToken(User user, String jwtToken) {

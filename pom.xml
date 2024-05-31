@@ -92,18 +92,10 @@
 			<version>1.36.0</version>
 		</dependency>
 
-		<!--
-  For Maven, add the following dependency to your POM and replace with the
-  version number you want to use from:
-  - https://mvnrepository.com/artifact/com.stripe/stripe-java or
-  - https://github.com/stripe/stripe-java/releases/latest
--->
 		<dependency>
-			<groupId>com.stripe</groupId>
-			<artifactId>stripe-java</artifactId>
-			<version>25.0.0</version>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-mail</artifactId>
 		</dependency>
-
 	</dependencies>
 
 	<build>

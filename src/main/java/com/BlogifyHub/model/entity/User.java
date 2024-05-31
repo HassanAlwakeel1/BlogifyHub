@@ -69,6 +69,9 @@ public class User implements UserDetails {
     @Column(name = "updated_at")
     private LocalDateTime updatedAt;
 
+    @Column(name = "enabled")
+    private boolean enabled = false; // By default, the user is not enabled
+
     @OneToMany(mappedBy = "user",cascade = CascadeType.REMOVE)
     @JsonManagedReference
     private List<Token> tokens;
@@ -135,6 +138,6 @@ public class User implements UserDetails {
 
     @Override
     public boolean isEnabled() {
-        return true;
+        return this.enabled;
     }
 }
