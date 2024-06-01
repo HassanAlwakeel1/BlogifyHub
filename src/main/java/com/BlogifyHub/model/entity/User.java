@@ -92,6 +92,16 @@ public class User implements UserDetails {
     @JsonManagedReference
     private List<Follow> followers;
 
+    @OneToMany(mappedBy = "subscriber", cascade = CascadeType.REMOVE)
+    @JsonManagedReference
+    private List<Subscription> subscriptions;
+
+    @Column(name = "subscribers_number")
+    private Integer subscribersNumber = 0;
+
+    @Column(name = "subscriptions_number")
+    private Integer subscriptionsNumber = 0;
+
     @Column(name = "followers_number")
     private Integer followersNumber = 0;
 
