@@ -7,18 +7,25 @@ import com.BlogifyHub.model.DTO.PostResponseDTO;
 import com.BlogifyHub.model.DTO.ProfileResponseDTO;
 import com.BlogifyHub.model.entity.Category;
 import com.BlogifyHub.model.entity.Post;
+import com.BlogifyHub.model.entity.Subscription;
 import com.BlogifyHub.model.entity.User;
 import com.BlogifyHub.model.mapper.PostMapper;
 import com.BlogifyHub.repository.CategoryRepository;
 import com.BlogifyHub.repository.PostRepository;
+import com.BlogifyHub.repository.SubscriptionRepository;
 import com.BlogifyHub.repository.UserRepository;
 import com.BlogifyHub.service.PostService;
+import jakarta.mail.MessagingException;
+import jakarta.mail.internet.MimeMessage;
 import org.modelmapper.ModelMapper;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
+import org.springframework.mail.SimpleMailMessage;
+import org.springframework.mail.javamail.JavaMailSender;
+import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -35,14 +42,22 @@ public class PostServiceimpl implements PostService {
 
     private PostMapper postMapper;
 
+    private SubscriptionRepository subscriptionRepository;
+    private  JavaMailSender mailSender;
+
+
     public PostServiceimpl(PostRepository postRepository,
                            CategoryRepository categoryRepository,
                            UserRepository userRepository,
-                           PostMapper postMapper){
+                           PostMapper postMapper,
+                           SubscriptionRepository subscriptionRepository,
+                           JavaMailSender mailSender){
         this.postRepository = postRepository;
         this.categoryRepository = categoryRepository;
         this.userRepository = userRepository;
         this.postMapper = postMapper;
+        this.subscriptionRepository = subscriptionRepository;
+        this.mailSender = mailSender;
     }
 
     @Override
@@ -62,7 +77,36 @@ public class PostServiceimpl implements PostService {
         Post newPost = postRepository.save(post);
         PostDTO postRespose = postMapper.mapToDTO(newPost);
         postRespose.setProfileResponseDTO(profileResponseDTO);
+
+        // Notify subscribers
+        List<Subscription> subscriptions = subscriptionRepository.findByUser(user);
+        for (Subscription subscription : subscriptions) {
+            User subscriber = subscription.getSubscriber();
+            String subject = "New Post from " + user.getFirstName() + " " + user.getLastName();
+            String body = "Dear " + subscriber.getFirstName() + ",<br><br>" +
+                    user.getFirstName() + " " + user.getLastName() + " has posted a new article titled: " +
+                    post.getTitle() + ".<br><br>" +
+                    "Description: " + post.getDescription() + "<br><br>" +
+                    "Read more on BlogifyHub.<br><br>" +
+                    "Best regards,<br>BlogifyHub Team";
+
+            sendEmail(subscriber.getEmail(), subject, body);
+        }
+
         return postRespose;
+    }
+    private void sendEmail(String to, String subject, String body) {
+        MimeMessage message = mailSender.createMimeMessage();
+        MimeMessageHelper helper = new MimeMessageHelper(message);
+
+        try {
+            helper.setTo(to);
+            helper.setSubject(subject);
+            helper.setText(body, true);
+            mailSender.send(message);
+        } catch (MessagingException e) {
+            throw new RuntimeException("Failed to send email", e);
+        }
     }
 
     @Override
