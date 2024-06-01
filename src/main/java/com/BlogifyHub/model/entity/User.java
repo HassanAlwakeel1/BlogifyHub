@@ -110,6 +110,10 @@ public class User implements UserDetails {
     @JsonManagedReference
     private List<CommentClap> commentClaps;
 
+    @OneToMany(mappedBy = "reportedBy")
+    @JsonManagedReference
+    private List<Report> reports;
+
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
         return List.of(new SimpleGrantedAuthority(role.name()));
