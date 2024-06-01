@@ -1,9 +1,6 @@
 package com.BlogifyHub.controller;
 
-import com.BlogifyHub.model.DTO.JwtAuthenticationResponse;
-import com.BlogifyHub.model.DTO.RefreshTokenRequest;
-import com.BlogifyHub.model.DTO.SignInRequest;
-import com.BlogifyHub.model.DTO.SignUpRequest;
+import com.BlogifyHub.model.DTO.*;
 import com.BlogifyHub.service.AuthenticationService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -29,6 +26,20 @@ public class AuthenticationController {
     @GetMapping("/refresh")
     public ResponseEntity<JwtAuthenticationResponse> refresh(@RequestBody RefreshTokenRequest refreshTokenRequest){
         return ResponseEntity.ok(authenticationService.refreshToken(refreshTokenRequest));
+    }
+
+    @PostMapping("/forgot-password")
+    public ResponseEntity<String> forgotPassword(@RequestParam("email") String email) {
+        authenticationService.initiatePasswordReset(email);
+        return ResponseEntity.ok("Password reset link has been sent to your email");
+    }
+
+    @PostMapping("/reset-password")
+    public ResponseEntity<String> resetPassword(@RequestBody ResetPasswordRequest request) {
+        String token = request.getToken();
+        String newPassword = request.getNewPassword();
+        authenticationService.resetPassword(token, newPassword);
+        return ResponseEntity.ok("Password has been reset successfully");
     }
 }
 

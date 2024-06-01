@@ -4,10 +4,12 @@ import com.BlogifyHub.model.DTO.JwtAuthenticationResponse;
 import com.BlogifyHub.model.DTO.RefreshTokenRequest;
 import com.BlogifyHub.model.DTO.SignInRequest;
 import com.BlogifyHub.model.DTO.SignUpRequest;
+import com.BlogifyHub.model.entity.PasswordResetToken;
 import com.BlogifyHub.model.entity.Token;
 import com.BlogifyHub.model.entity.User;
 import com.BlogifyHub.model.entity.VerificationToken;
 import com.BlogifyHub.model.entity.enums.TokenType;
+import com.BlogifyHub.repository.PasswordResetTokenRepository;
 import com.BlogifyHub.repository.TokenRepository;
 import com.BlogifyHub.repository.UserRepository;
 import com.BlogifyHub.service.AuthenticationService;
@@ -18,10 +20,15 @@ import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
 import java.util.HashMap;
+import java.util.Optional;
+import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
@@ -40,6 +47,8 @@ public class AuthenticationServiceImpl implements AuthenticationService {
     private final VerificationTokenService tokenService;
 
     private final JavaMailSender mailSender;
+
+    private final PasswordResetTokenRepository passwordResetTokenRepository;
 
     public JwtAuthenticationResponse signup(SignUpRequest signUpRequest){
         User user = new User();
@@ -133,6 +142,48 @@ public class AuthenticationServiceImpl implements AuthenticationService {
             return jwtAuthenticationResponse;
         }
         return null;
+    }
+
+    public void initiatePasswordReset(String email) {
+        Optional<User> optionalUser = userRepository.findByEmail(email);
+        if (optionalUser.isEmpty()) {
+            throw new UsernameNotFoundException("No user found with email: " + email);
+        }
+        User user = optionalUser.get();
+
+        String token = UUID.randomUUID().toString();
+        PasswordResetToken resetToken = new PasswordResetToken();
+        resetToken.setToken(token);
+        resetToken.setUser(user);
+        resetToken.setExpiryDate(LocalDateTime.now().plusHours(1)); // Token valid for 1 hour
+        passwordResetTokenRepository.save(resetToken);
+
+        String resetUrl = "http://localhost:2020/api/v1/auth/reset-password?token=" + token;
+
+        sendResetEmail(user.getEmail(), resetUrl);
+    }
+
+    private void sendResetEmail(String email, String resetUrl) {
+        SimpleMailMessage message = new SimpleMailMessage();
+        message.setTo(email);
+        message.setSubject("Password Reset Request");
+        message.setText("To reset your password, click the link below:\n" + resetUrl);
+        mailSender.send(message);
+    }
+
+    @Override
+    public void resetPassword(String token, String newPassword) {
+        Optional<PasswordResetToken> tokenOptional = passwordResetTokenRepository.findByToken(token);
+        if (tokenOptional.isEmpty() || tokenOptional.get().getExpiryDate().isBefore(LocalDateTime.now())) {
+            throw new IllegalArgumentException("Invalid or expired token");
+        }
+
+        User user = tokenOptional.get().getUser();
+        user.setPassword(new BCryptPasswordEncoder().encode(newPassword));
+        userRepository.save(user);
+
+        // Invalidate the token after use
+        passwordResetTokenRepository.delete(tokenOptional.get());
     }
 }
 
