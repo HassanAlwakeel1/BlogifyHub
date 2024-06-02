@@ -2,6 +2,7 @@ package com.BlogifyHub.service.impl;
 
 import com.BlogifyHub.service.CloudinaryImageService;
 import com.cloudinary.Cloudinary;
+import com.cloudinary.utils.ObjectUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -10,19 +11,28 @@ import java.util.Map;
 
 @Service
 public class CloudinaryImageServiceImpl implements CloudinaryImageService {
-    private Cloudinary cloudinary;
+
+    private final Cloudinary cloudinary;
 
     public CloudinaryImageServiceImpl(Cloudinary cloudinary) {
         this.cloudinary = cloudinary;
     }
 
     @Override
-    public Map upload(MultipartFile file) {
+    public Map<String, Object> upload(byte[] fileBytes) {
         try {
-            Map data = this.cloudinary.uploader().upload(file.getBytes(),Map.of());
-            return data;
+            return cloudinary.uploader().upload(fileBytes, ObjectUtils.emptyMap());
         } catch (IOException e) {
-            throw new RuntimeException("Image uploading Failed..");
+            throw new RuntimeException("Image upload failed", e);
+        }
+    }
+
+    @Override
+    public Map<String, Object> upload(MultipartFile file) {
+        try {
+            return cloudinary.uploader().upload(file.getBytes(), ObjectUtils.emptyMap());
+        } catch (IOException e) {
+            throw new RuntimeException("Image upload failed", e);
         }
     }
 }

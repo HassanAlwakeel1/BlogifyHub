@@ -77,7 +77,7 @@ public class AuthenticationServiceImpl implements AuthenticationService {
                 .build();
     }
     private void sendVerificationEmail(User user, String token) {
-        String url = "http://localhost:8080/api/v1/auth/verify?token=" + token;
+        String url = "http://localhost:2000/api/v1/auth/verify?token=" + token;
         SimpleMailMessage email = new SimpleMailMessage();
         email.setTo(user.getEmail());
         email.setSubject("Verify your email");

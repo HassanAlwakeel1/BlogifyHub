@@ -31,6 +31,7 @@ public class Post {
     @Column(name = "description",nullable = false)
     private String description;
 
+    @Lob
     @Column(name = "content",nullable = false)
     private String content;
 

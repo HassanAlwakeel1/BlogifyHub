@@ -14,22 +14,28 @@ import com.BlogifyHub.repository.CategoryRepository;
 import com.BlogifyHub.repository.PostRepository;
 import com.BlogifyHub.repository.SubscriptionRepository;
 import com.BlogifyHub.repository.UserRepository;
+import com.BlogifyHub.service.CloudinaryImageService;
 import com.BlogifyHub.service.PostService;
 import jakarta.mail.MessagingException;
 import jakarta.mail.internet.MimeMessage;
-import org.modelmapper.ModelMapper;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
-import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.*;
+import java.net.URL;
 import java.util.List;
+import java.util.Map;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
+import org.springframework.mock.web.MockMultipartFile;
 
 @Service
 public class PostServiceimpl implements PostService {
@@ -45,27 +51,35 @@ public class PostServiceimpl implements PostService {
     private SubscriptionRepository subscriptionRepository;
     private  JavaMailSender mailSender;
 
+    private CloudinaryImageService cloudinaryImageService;
+
 
     public PostServiceimpl(PostRepository postRepository,
                            CategoryRepository categoryRepository,
                            UserRepository userRepository,
                            PostMapper postMapper,
                            SubscriptionRepository subscriptionRepository,
-                           JavaMailSender mailSender){
+                           JavaMailSender mailSender,
+                           CloudinaryImageService cloudinaryImageService){
         this.postRepository = postRepository;
         this.categoryRepository = categoryRepository;
         this.userRepository = userRepository;
         this.postMapper = postMapper;
         this.subscriptionRepository = subscriptionRepository;
         this.mailSender = mailSender;
+        this.cloudinaryImageService = cloudinaryImageService;
     }
 
     @Override
     public PostDTO createPost(PostDTO postDTO, Long userId) {
         Post post = postMapper.mapToEntity(postDTO);
         User user = userRepository.findById(userId)
-                .orElseThrow(()-> new ResourceNotFoundException("User","id",userId));
+                .orElseThrow(() -> new ResourceNotFoundException("User", "id", userId));
         post.setUser(user);
+
+        String processedContent = processContentImages(post.getContent());
+        post.setContent(processedContent);
+
         ProfileResponseDTO profileResponseDTO = new ProfileResponseDTO(
                 user.getId(),
                 user.getFirstName(),
@@ -75,10 +89,58 @@ public class PostServiceimpl implements PostService {
                 user.getFollowersNumber()
         );
         Post newPost = postRepository.save(post);
-        PostDTO postRespose = postMapper.mapToDTO(newPost);
-        postRespose.setProfileResponseDTO(profileResponseDTO);
+        PostDTO postResponse = postMapper.mapToDTO(newPost);
+        postResponse.setProfileResponseDTO(profileResponseDTO);
 
-        // Notify subscribers
+        notifySubscribers(user, post);
+
+        return postResponse;
+    }
+
+    private String processContentImages(String content) {
+        Pattern pattern = Pattern.compile("<img src='(.*?)'");
+        Matcher matcher = pattern.matcher(content);
+        while (matcher.find()) {
+            String imageUrl = matcher.group(1);
+            try {
+                File imageFile = downloadImageToFile(imageUrl);
+                MultipartFile multipartFile = convertFileToMultipartFile(imageFile);
+                Map<String, Object> uploadResult = cloudinaryImageService.upload(multipartFile);
+                String cloudinaryUrl = uploadResult.get("url").toString();
+                content = content.replace(imageUrl, cloudinaryUrl);
+
+                // Optionally delete the temporary file after upload
+                imageFile.delete();
+            } catch (Exception e) {
+                throw new RuntimeException("Image processing failed for URL: " + imageUrl, e);
+            }
+        }
+        return content;
+    }
+
+
+    private File downloadImageToFile(String imageUrl) {
+        try (InputStream in = new URL(imageUrl).openStream()) {
+            File tempFile = File.createTempFile("downloaded-image", ".jpg");
+            try (FileOutputStream out = new FileOutputStream(tempFile)) {
+                in.transferTo(out);
+            }
+            return tempFile;
+        } catch (IOException e) {
+            throw new RuntimeException("Failed to download image", e);
+        }
+    }
+
+    private MultipartFile convertFileToMultipartFile(File file) {
+        try {
+            FileInputStream input = new FileInputStream(file);
+            return new MockMultipartFile("file", file.getName(), "image/jpeg", input);
+        } catch (IOException e) {
+            throw new RuntimeException("Failed to convert file to MultipartFile", e);
+        }
+    }
+
+    private void notifySubscribers(User user, Post post) {
         List<Subscription> subscriptions = subscriptionRepository.findByUser(user);
         for (Subscription subscription : subscriptions) {
             User subscriber = subscription.getSubscriber();
@@ -92,8 +154,6 @@ public class PostServiceimpl implements PostService {
 
             sendEmail(subscriber.getEmail(), subject, body);
         }
-
-        return postRespose;
     }
     private void sendEmail(String to, String subject, String body) {
         MimeMessage message = mailSender.createMimeMessage();
@@ -229,7 +289,7 @@ public class PostServiceimpl implements PostService {
 
         List<Post> posts = postRepository.findByCategoryId(categoryId);
 
-         List<PostDTO> postDTOList = posts.stream()
+        List<PostDTO> postDTOList = posts.stream()
                 .map(post -> {
                     PostDTO postDTO = postMapper.mapToDTO(post);
                     User user = post.getUser();
@@ -245,6 +305,6 @@ public class PostServiceimpl implements PostService {
                     return postDTO;
                 })
                 .collect(Collectors.toList());
-         return postDTOList;
+        return postDTOList;
     }
 }
