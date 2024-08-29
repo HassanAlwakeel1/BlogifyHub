@@ -1,9 +1,6 @@
 package com.BlogifyHub.model.mapper.impl;
 
-import com.BlogifyHub.model.DTO.CustomUserDTO;
-import com.BlogifyHub.model.DTO.ProfileDTO;
-import com.BlogifyHub.model.DTO.ProfileResponseDTO;
-import com.BlogifyHub.model.DTO.UserDTO;
+import com.BlogifyHub.model.DTO.*;
 import com.BlogifyHub.model.entity.User;
 import com.BlogifyHub.model.mapper.UserMapper;
 import org.modelmapper.ModelMapper;

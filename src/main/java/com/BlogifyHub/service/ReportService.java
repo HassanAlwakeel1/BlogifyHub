@@ -1,6 +1,7 @@
 package com.BlogifyHub.service;
 
 import com.BlogifyHub.model.entity.Report;
+import com.BlogifyHub.model.entity.User;
 import com.BlogifyHub.model.entity.enums.ContentType;
 import org.springframework.security.core.Authentication;
 
@@ -13,4 +14,6 @@ public interface ReportService {
                         ContentType contentType);
 
     List<Report> getAllReports();
+
+    void reviewReport(Long reportId, Authentication authentication, boolean shouldDelete, String moderatorComment);
 }
