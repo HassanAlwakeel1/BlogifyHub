@@ -12,6 +12,7 @@ import com.BlogifyHub.model.mapper.CommentMapper;
 import com.BlogifyHub.repository.CommentRepository;
 import com.BlogifyHub.repository.PostRepository;
 import com.BlogifyHub.repository.UserRepository;
+import com.BlogifyHub.security.RequiresActiveAccount;
 import com.BlogifyHub.service.CommentService;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.core.Authentication;
@@ -42,6 +43,7 @@ public class CommentServiceImpl implements CommentService {
 
 
     @Override
+    @RequiresActiveAccount
     public CommentDTO createComment(long postId, CommentDTO commentDTO, Authentication authentication) {
         String email = authentication.getName();
         User user = userRepository.findByEmail(email)
@@ -117,6 +119,7 @@ public class CommentServiceImpl implements CommentService {
     }
 
     @Override
+    @RequiresActiveAccount
     public CommentDTO updateComment(long postId, long commentId, CommentDTO commentDTO, Authentication authentication) {
         String email = authentication.getName();
         User user = userRepository.findByEmail(email)
@@ -153,6 +156,7 @@ public class CommentServiceImpl implements CommentService {
      * This user might be the owner of the comment, the owner of the post, or an admin.
      * */
     @Override
+    @RequiresActiveAccount
     public void deleteComment(Long postId, Long commentId, Authentication authentication) {
         String email = authentication.getName();
         User user = userRepository.findByEmail(email)

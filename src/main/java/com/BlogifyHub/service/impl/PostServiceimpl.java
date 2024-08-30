@@ -14,6 +14,7 @@ import com.BlogifyHub.repository.CategoryRepository;
 import com.BlogifyHub.repository.PostRepository;
 import com.BlogifyHub.repository.SubscriptionRepository;
 import com.BlogifyHub.repository.UserRepository;
+import com.BlogifyHub.security.RequiresActiveAccount;
 import com.BlogifyHub.service.CloudinaryImageService;
 import com.BlogifyHub.service.PostService;
 import jakarta.mail.MessagingException;
@@ -71,6 +72,7 @@ public class PostServiceimpl implements PostService {
     }
 
     @Override
+    @RequiresActiveAccount
     public PostDTO createPost(PostDTO postDTO, Long userId) {
         Post post = postMapper.mapToEntity(postDTO);
         User user = userRepository.findById(userId)
@@ -232,6 +234,7 @@ public class PostServiceimpl implements PostService {
     }
 
     @Override
+    @RequiresActiveAccount
     public PostDTO updatePost(PostDTO postDTO, long userId, long postId) {
         Post post = postRepository.findById(postId)
                 .orElseThrow(()-> new ResourceNotFoundException("Post","id",postId));
@@ -271,6 +274,7 @@ public class PostServiceimpl implements PostService {
      * the throw from occurring in case of success.
      */
     @Override
+    @RequiresActiveAccount
     public void deletePostById(long userId, long postId) {
         Post post = postRepository.findById(postId)
                 .orElseThrow(()-> new ResourceNotFoundException("Post","id",postId));
