@@ -41,4 +41,25 @@ public class PostController {
         List<PostDTO> postDtos = postService.getPostsByCategory(categoryId);
         return ResponseEntity.ok(postDtos);
     }
+
+    @PostMapping("/{userId}")
+    public ResponseEntity<PostDTO> createPost(@Valid @RequestBody PostDTO postDTO, @PathVariable Long userId){
+        return new ResponseEntity<>(postService.createPost(postDTO,userId), HttpStatus.CREATED);
+    }
+
+    @PutMapping("/{userId}/{postId}")
+    public ResponseEntity<PostDTO> updatePost(@Valid @RequestBody PostDTO postDTO,
+                                              @PathVariable(name = "userId")long userId,
+                                              @PathVariable(name = "postId") long postId
+    ){
+        PostDTO postResponse = postService.updatePost(postDTO,userId,postId);
+        return new ResponseEntity<>(postResponse,HttpStatus.OK);
+    }
+
+    @DeleteMapping("/{userId}/{postId}")
+    public ResponseEntity<String> deletePost(@PathVariable(name = "userId") long userId,
+                                             @PathVariable(name = "postId") long postId){
+        postService.deletePostById(userId,postId);
+        return new ResponseEntity<>("Post entity deleted successfully.",HttpStatus.OK);
+    }
 }
