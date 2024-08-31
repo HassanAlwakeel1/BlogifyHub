@@ -3,6 +3,7 @@ package com.BlogifyHub.controller;
 import com.BlogifyHub.model.DTO.*;
 import com.BlogifyHub.service.PostService;
 import com.BlogifyHub.service.UserService;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -12,6 +13,7 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/api/users")
+@Tag(name = "User")
 public class UserController {
     private UserService userService;
     private PostService postService;

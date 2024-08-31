@@ -3,6 +3,7 @@ package com.BlogifyHub.controller;
 import com.BlogifyHub.model.DTO.PostListDTO;
 import com.BlogifyHub.model.entity.PostList;
 import com.BlogifyHub.service.PostListService;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -11,6 +12,7 @@ import java.util.Set;
 
 @RestController
 @RequestMapping("api/users/{id}/post-lists")
+@Tag(name = "PostLists")
 public class PostListController {
     private PostListService postListService;
 

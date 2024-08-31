@@ -2,6 +2,7 @@ package com.BlogifyHub.controller;
 
 import com.BlogifyHub.model.DTO.ProfileResponseDTO;
 import com.BlogifyHub.service.MuteService;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
@@ -10,6 +11,7 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/api/mutes")
+@Tag(name = "Mute")
 public class MuteController {
     private MuteService muteService;
 

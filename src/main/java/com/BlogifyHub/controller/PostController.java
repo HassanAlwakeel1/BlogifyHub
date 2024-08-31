@@ -4,6 +4,7 @@ import com.BlogifyHub.model.DTO.PostDTO;
 import com.BlogifyHub.model.DTO.PostResponseDTO;
 import com.BlogifyHub.service.PostService;
 import com.BlogifyHub.utility.AppConstants;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -14,6 +15,7 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/api/posts")
+@Tag(name = "Post")
 public class PostController {
 
     private PostService postService;

@@ -2,6 +2,7 @@ package com.BlogifyHub.controller;
 
 import com.BlogifyHub.model.DTO.ProfileResponseDTO;
 import com.BlogifyHub.service.SubscriptionService;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
@@ -9,6 +10,7 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/api/subscriptions")
+@Tag(name = "Subscription")
 public class SubscriptionController {
     private SubscriptionService subscriptionService;
 

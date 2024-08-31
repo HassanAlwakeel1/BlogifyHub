@@ -5,6 +5,7 @@ import com.BlogifyHub.model.entity.Report;
 import com.BlogifyHub.model.entity.User;
 import com.BlogifyHub.model.entity.enums.ContentType;
 import com.BlogifyHub.service.ReportService;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
@@ -13,6 +14,7 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/api/v1/reports")
+@Tag(name = "Report")
 public class ReportController {
     private ReportService reportService;
 
