@@ -17,6 +17,7 @@ import com.BlogifyHub.repository.UserRepository;
 import com.BlogifyHub.security.RequiresActiveAccount;
 import com.BlogifyHub.service.CloudinaryImageService;
 import com.BlogifyHub.service.PostService;
+import com.BlogifyHub.utility.FileMultipartFile;
 import jakarta.mail.MessagingException;
 import jakarta.mail.internet.MimeMessage;
 import org.springframework.data.domain.Page;
@@ -27,7 +28,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.stereotype.Service;
-import org.springframework.web.multipart.MultipartFile;
 
 import java.io.*;
 import java.net.URL;
@@ -36,7 +36,8 @@ import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
-import org.springframework.mock.web.MockMultipartFile;
+import org.springframework.web.multipart.MultipartFile;
+
 
 @Service
 public class PostServiceimpl implements PostService {
@@ -134,12 +135,7 @@ public class PostServiceimpl implements PostService {
     }
 
     private MultipartFile convertFileToMultipartFile(File file) {
-        try {
-            FileInputStream input = new FileInputStream(file);
-            return new MockMultipartFile("file", file.getName(), "image/jpeg", input);
-        } catch (IOException e) {
-            throw new RuntimeException("Failed to convert file to MultipartFile", e);
-        }
+        return new FileMultipartFile(file, "image/jpeg");
     }
 
     private void notifySubscribers(User user, Post post) {
